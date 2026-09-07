@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宠物起名事务所｜给毛孩子起个好名字</title>
+<meta name="description" content="给猫、狗、兔子、仓鼠、小鸟起名字：按性格选风格，一键生成，支持复制。Hot take：给宠物起名，比给人起名还认真。">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<style>
+  :root{
+    --ink:#161616;
+    --ink-soft:#4a4a4a;
+    --gray:#717171;
+    --line:#e8e8e4;
+    --accent:#00a9cc;
+    --accent-deep:#007e9c;
+    --pink:#ff6b9d;   --pink-bg:#ffe3ee;
+    --yellow:#ffc53d; --yellow-bg:#fff3cf;
+    --green:#3fae7a;  --green-bg:#ddf5e8;
+    --purple:#8b7cf6; --purple-bg:#ece8ff;
+    --orange:#ff8a4c; --orange-bg:#ffe8d9;
+    --cyan-bg:#dcf4ff;
+    --radius:18px;
+    --maxw:1180px;
+    --shadow:0 12px 32px rgba(22,22,22,.10);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    color:var(--ink);
+    background:#ffffff;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
+  img{max-width:100%;display:block}
+  ::selection{background:var(--accent);color:#fff}
+  :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  /* ============ 通用组件 ============ */
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent-deep);
+  }
+  .eyebrow::before{content:"";width:22px;height:4px;border-radius:99px;background:var(--accent);flex:none}
+  h2.sec-title{font-size:clamp(30px,4vw,46px);font-weight:900;line-height:1.12;letter-spacing:-.01em;margin:14px 0 12px;text-wrap:balance}
+  .sec-sub{font-size:16px;color:var(--gray);max-width:58ch;margin:0}
+  .section{padding:clamp(64px,9vw,108px) 0}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    border:2px solid var(--ink);border-radius:999px;
+    padding:14px 30px;font-size:16px;font-weight:800;cursor:pointer;
+    transition:background .15s,color .15s,transform .15s,box-shadow .15s;
+  }
+  .btn-dark{background:var(--ink);color:#fff}
+  .btn-dark:hover{background:var(--accent);border-color:var(--accent)}
+  .btn-ghost{background:transparent;color:var(--ink)}
+  .btn-ghost:hover{background:var(--ink);color:#fff}
+  .btn:active{transform:translateY(2px)}
+
+  .pill{
+    border:2px solid var(--ink);background:#fff;border-radius:999px;
+    padding:9px 20px;font-size:14px;font-weight:700;cursor:pointer;
+    transition:background .15s,color .15s,transform .15s;
+  }
+  .pill:hover{transform:translateY(-2px)}
+  .pill[aria-pressed="true"]{background:var(--ink);color:#fff}
+
+  .tag{
+    display:inline-block;padding:3px 10px;border-radius:999px;
+    font-size:12px;font-weight:800;line-height:1.5;
+  }
+  .tag.cute{background:var(--pink-bg);color:var(--ink)}
+  .tag.artsy{background:var(--cyan-bg);color:var(--ink)}
+  .tag.boss{background:var(--yellow-bg);color:var(--ink)}
+  .tag.funny{background:var(--green-bg);color:var(--ink)}
+  .tag.food{background:var(--orange-bg);color:var(--ink)}
+  .tag.ancient{background:var(--purple-bg);color:var(--ink)}
+  .tag.trendy{background:var(--yellow-bg);color:var(--ink)}
+  .tag.soft{background:var(--pink-bg);color:var(--ink)}
+  .tag.pet{background:var(--ink);color:#fff}
+
+  mark{
+    background:var(--accent);color:var(--ink);
+    padding:.05em .18em;border-radius:.14em;
+    -webkit-box-decoration-break:clone;box-decoration-break:clone;
+  }
+
+  /* ============ 导航 ============ */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.88);
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:70px}
+  .logo{display:inline-flex;align-items:center;gap:10px;font-size:20px;font-weight:900;letter-spacing:-.01em}
+  .logo .paw{color:var(--accent);display:inline-flex}
+  .nav-links{display:flex;gap:30px;align-items:center}
+  .nav-links a{font-size:15px;font-weight:600;color:var(--ink-soft);transition:color .15s}
+  .nav-links a:hover{color:var(--accent)}
+  .nav-cta{padding:10px 22px;font-size:14px}
+
+  /* ============ Hero ============ */
+  .hero{padding:clamp(56px,8vw,96px) 0 clamp(40px,6vw,72px)}
+  .hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:56px;align-items:center}
+  .hero h1{
+    font-size:clamp(38px,5.4vw,70px);font-weight:900;line-height:1.1;
+    letter-spacing:-.02em;margin:20px 0 18px;text-wrap:balance;
+  }
+  .hero-sub{font-size:17px;color:var(--ink-soft);max-width:46ch;margin:0}
+  .rotator-line{margin-top:14px;font-size:15px;color:var(--gray)}
+  .rotator-line b{
+    font-weight:800;color:var(--ink);
+    border-bottom:3px solid var(--accent);
+    display:inline-block;min-width:8ch;text-align:center;
+    transition:opacity .3s;
+  }
+  .rotator-line b.fade{opacity:0}
+  .hero-actions{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+  .hero-note{margin-top:16px;font-size:13px;color:var(--gray)}
+  .hero-art{position:relative}
+  .hero-art img{
+    width:100%;border:3px solid var(--ink);border-radius:26px;
+    box-shadow:12px 12px 0 var(--yellow);
+  }
+  .deco-star{position:absolute;top:-22px;right:8%;color:var(--accent);transform:rotate(14deg)}
+  .deco-squiggle{position:absolute;bottom:-16px;left:-10px;color:var(--pink);transform:rotate(-6deg)}
+  .deco-dots{position:absolute;top:14px;left:-20px;color:var(--yellow)}
+
+  /* ============ 生成器 ============ */
+  .generator{background:#f7f7f4;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .gen-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:34px}
+  .panel{
+    background:#fff;border:3px solid var(--ink);border-radius:26px;
+    box-shadow:14px 14px 0 var(--accent);
+    padding:clamp(22px,3.4vw,38px);
+  }
+  .field{margin-bottom:24px}
+  .field:last-of-type{margin-bottom:20px}
+  .field-label{display:block;font-size:14px;font-weight:800;margin-bottom:11px}
+  .field-label small{font-weight:500;color:var(--gray);margin-left:6px}
+  .pills{display:flex;flex-wrap:wrap;gap:10px}
+  .gen-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .hint-line{font-size:13px;color:var(--gray)}
+  .hint-line b{color:var(--accent-deep)}
+  .results{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:18px}
+  .rcard{
+    border:2.5px solid var(--ink);border-radius:var(--radius);background:#fff;
+    padding:18px;display:flex;flex-direction:column;gap:10px;position:relative;
+    transition:transform .16s,box-shadow .16s;
+    animation:rise .45s cubic-bezier(.2,.7,.3,1) backwards;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .rcard:hover{transform:translateY(-4px);box-shadow:8px 8px 0 rgba(0,169,204,.22)}
+  .rcard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .rname{font-size:26px;font-weight:900;line-height:1.1;margin:0;letter-spacing:-.01em}
+  .ract{display:flex;gap:8px;flex:none}
+  .mini-btn{
+    width:36px;height:36px;border:2px solid var(--ink);border-radius:11px;
+    background:#fff;display:inline-flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:background .15s,transform .15s;
+  }
+  .mini-btn:hover{background:var(--cyan-bg);transform:translateY(-2px)}
+  .mini-btn.done{background:var(--green);color:#fff}
+  .rcard-tags{display:flex;flex-wrap:wrap;gap:6px}
+  .rmean{font-size:13.5px;color:var(--gray);margin:0;line-height:1.6}
+  .relax-note{display:none;margin-top:16px;font-size:13px;color:var(--accent-deep);font-weight:600}
+
+  /* ============ 灵感 ============ */
+  .inspo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px;margin-top:38px}
+  .inspo-card{
+    border:2.5px solid var(--ink);border-radius:var(--radius);
+    padding:22px;display:flex;flex-direction:column;gap:10px;min-height:196px;
+    position:relative;overflow:hidden;
+    transition:transform .16s,box-shadow .16s;
+  }
+  .inspo-card:hover{transform:translateY(-4px);box-shadow:10px 10px 0 rgba(22,22,22,.14)}
+  .inspo-card .paw-faint{position:absolute;right:-12px;top:-8px;color:var(--ink);opacity:.12;transform:rotate(-18deg)}
+  .iname{font-size:27px;font-weight:900;margin:0;line-height:1.1;letter-spacing:-.01em}
+  .imean{font-size:14px;color:var(--ink-soft);margin:0;line-height:1.65}
+  .inspo-foot{margin-top:34px;text-align:center}
+  .inspo-foot .btn{font-size:15px;padding:13px 28px}
+
+  /* ============ 步骤 ============ */
+  .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:44px}
+  .step img{
+    width:100%;border:2.5px solid var(--ink);border-radius:20px;
+    transition:transform .16s,box-shadow .16s;
+  }
+  .step:hover img{transform:translateY(-4px);box-shadow:8px 8px 0 rgba(0,169,204,.2)}
+  .step-num{font-weight:900;font-size:13px;letter-spacing:.12em;color:var(--accent-deep);margin-top:16px}
+  .step h3{font-size:19px;font-weight:800;margin:6px 0 4px}
+  .step p{font-size:14px;color:var(--gray);margin:0}
+
+  /* ============ CTA 横幅 ============ */
+  .cta-band{background:var(--accent);padding:clamp(70px,10vw,120px) 0;text-align:center}
+  .cta-band h2{
+    font-size:clamp(32px,4.6vw,58px);font-weight:900;line-height:1.15;
+    letter-spacing:-.015em;margin:0 0 16px;text-wrap:balance;
+  }
+  .cta-band mark{background:#fff}
+  .cta-band p{font-size:17px;color:var(--ink-soft);margin:0 auto 30px;max-width:52ch}
+  .cta-band .btn-dark{background:var(--ink);border-color:var(--ink);color:#fff}
+  .cta-band .btn-dark:hover{background:#fff;border-color:#fff;color:var(--ink)}
+
+  /* ============ FAQ ============ */
+  .faq{background:#fff;border-bottom:1px solid var(--line)}
+  .faq-list{max-width:840px;margin:38px auto 0}
+  .faq-item{border:2px solid var(--ink);border-radius:16px;margin-bottom:14px;background:#fff;overflow:hidden}
+  .faq-item summary{
+    list-style:none;cursor:pointer;padding:18px 22px;
+    font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .faq-item summary::-webkit-details-marker{display:none}
+  .faq-item summary:hover{background:#fafaf7}
+  .plus{
+    width:28px;height:28px;border:2px solid var(--ink);border-radius:50%;
+    position:relative;flex:none;transition:transform .2s,background .2s;
+  }
+  .plus::before,.plus::after{content:"";position:absolute;background:var(--ink);left:50%;top:50%;transform:translate(-50%,-50%)}
+  .plus::before{width:12px;height:2px}
+  .plus::after{width:2px;height:12px}
+  .faq-item[open] .plus{transform:rotate(45deg);background:var(--accent)}
+  .faq-item[open] summary{border-bottom:2px solid var(--line)}
+  .faq-ans{padding:16px 22px 20px;font-size:15px;color:var(--ink-soft)}
+
+  /* ============ 页脚 ============ */
+  .footer{background:var(--ink);color:#fff;padding:60px 0 30px}
+  .footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px;margin-bottom:44px}
+  .footer .logo{color:#fff;margin-bottom:14px}
+  .footer .logo .paw{color:var(--accent)}
+  .f-tagline{font-size:14px;color:rgba(255,255,255,.72);max-width:34ch;margin:0}
+  .f-col h4{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin:0 0 14px}
+  .f-col a{display:block;font-size:14.5px;color:rgba(255,255,255,.82);margin-bottom:10px;transition:color .15s}
+  .f-col a:hover{color:var(--accent)}
+  .footer-bottom{
+    border-top:1px solid rgba(255,255,255,.16);padding-top:22px;
+    display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    font-size:13px;color:rgba(255,255,255,.6)
+  }
+  .footer-bottom .made{font-weight:700;color:rgba(255,255,255,.85)}
+
+  /* ============ 响应式 ============ */
+  @media (max-width:980px){
+    .hero-grid{grid-template-columns:1fr;gap:48px}
+    .hero-art{max-width:520px;margin:0 auto}
+    .steps-grid{grid-template-columns:repeat(2,1fr)}
+    .footer-top{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:820px){
+    .nav-links{display:none}
+  }
+  @media (max-width:560px){
+    .steps-grid{grid-template-columns:1fr}
+    .footer-top{grid-template-columns:1fr}
+    .hero-actions .btn{flex:1}
+    .panel{box-shadow:8px 8px 0 var(--accent)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001s !important;transition-duration:.001s !important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ 导航 ============ -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="logo" href="#top" data-scroll="hero">
+      <span class="paw" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg>
+      </span>
+      宠名社
+    </a>
+    <nav class="nav-links" aria-label="主导航">
+      <a href="#generator" data-scroll="generator">起名神器</a>
+      <a href="#inspo" data-scroll="inspo">名字灵感</a>
+      <a href="#steps" data-scroll="steps">起名四步</a>
+      <a href="#faq" data-scroll="faq">常见问题</a>
+      <a class="btn btn-dark nav-cta" href="#generator" data-scroll="generator">开始起名</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ============ Hero ============ -->
+  <section class="hero" id="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Pet Naming Studio · 宠物起名事务所</span>
+        <h1>Hot take: 给宠物起名，<mark>比给人起名</mark> 还认真。</h1>
+        <p class="hero-sub">名字会陪它走完这一生，还会被你每天喊八百遍。选得好不好，毛孩子心里有数。</p>
+        <p class="rotator-line">起名难度，不亚于——<b id="rotator" aria-live="off">找对象</b></p>
+        <div class="hero-actions">
+          <a class="btn btn-dark" href="#generator" data-scroll="generator">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg>
+            开始起名
+          </a>
+          <a class="btn btn-ghost" href="#inspo" data-scroll="inspo">看看名字灵感</a>
+        </div>
+        <p class="hero-note">免费 · 无需注册 · 已为 <b id="blessed">28,431</b> 只毛孩子赐名</p>
+      </div>
+      <div class="hero-art">
+        <svg class="deco-star" viewBox="0 0 24 24" width="46" height="46" fill="currentColor" aria-hidden="true"><path d="M12 2c1.2 6 4.2 8.8 10 10-5.8 1.2-8.8 4-10 10-1.2-6-4.2-8.8-10-10 5.8-1.2 8.8-4 10-10z"/></svg>
+        <svg class="deco-dots" width="60" height="24" viewBox="0 0 60 24" fill="currentColor" aria-hidden="true"><circle cx="6" cy="6" r="3.4"/><circle cx="24" cy="16" r="3.4"/><circle cx="44" cy="5" r="3.4"/><circle cx="56" cy="17" r="2.6"/></svg>
+        <img src="https://aka.doubaocdn.com/s/xbIeTKSvIW" alt="两只戴着名牌项圈的猫咪的拼贴插画" width="1024" height="1024">
+        <svg class="deco-squiggle" viewBox="0 0 80 24" width="110" height="32" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" aria-hidden="true"><path d="M4 16C16 6 26 22 38 12s20 10 38 0"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 起名神器 ============ -->
+  <section class="section generator" id="generator">
+    <div class="wrap">
+      <div class="gen-head">
+        <div>
+          <span class="eyebrow">Name Generator · 起名神器</span>
+          <h2 class="sec-title">选好毛孩子的类型和风格，<br>剩下的交给它。</h2>
+        </div>
+        <p class="sec-sub">几百个编辑手挑的名字，按宠物类型、性别与风格即时筛选，随机抽取，绝对公平。</p>
+      </div>
+
+      <div class="panel">
+        <div class="field">
+          <label class="field-label" id="lbl-pet">宠物类型</label>
+          <div class="pills" role="group" aria-labelledby="lbl-pet">
+            <button type="button" class="pill" data-group="pet" data-value="cat" aria-pressed="false">猫</button>
+            <button type="button" class="pill" data-group="pet" data-value="dog" aria-pressed="false">狗</button>
+            <button type="button" class="pill" data-group="pet" data-value="rabbit" aria-pressed="false">兔子</button>
+            <button type="button" class="pill" data-group="pet" data-value="hamster" aria-pressed="false">仓鼠</button>
+            <button type="button" class="pill" data-group="pet" data-value="bird" aria-pressed="false">鸟</button>
+            <button type="button" class="pill" data-group="pet" data-value="any" aria-pressed="true">通用</button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" id="lbl-gender">性别</label>
+          <div class="pills" role="group" aria-labelledby="lbl-gender">
+            <button type="button" class="pill" data-group="gender" data-value="m" aria-pressed="false">男孩</button>
+            <button type="button" class="pill" data-group="gender" data-value="f" aria-pressed="false">女孩</button>
+            <button type="button" class="pill" data-group="gender" data-value="any" aria-pressed="true">不限</button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" id="lbl-style">风格<small>可多选，不选就是全部都要</small></label>
+          <div class="pills" role="group" aria-labelledby="lbl-style">
+            <button type="button" class="pill" data-group="style" data-value="cute" aria-pressed="false">可爱</button>
+            <button type="button" class="pill" data-group="style" data-value="artsy" aria-pressed="false">文艺</button>
+            <button type="button" class="pill" data-group="style" data-value="boss" aria-pressed="false">霸气</button>
+            <button type="button" class="pill" data-group="style" data-value="funny" aria-pressed="false">搞笑</button>
+            <button type="button" class="pill" data-group="style" data-value="food" aria-pressed="false">吃货</button>
+            <button type="button" class="pill" data-group="style" data-value="ancient" aria-pressed="false">古风</button>
+            <button type="button" class="pill" data-group="style" data-value="trendy" aria-pressed="false">洋气</button>
+            <button type="button" class="pill" data-group="style" data-value="soft" aria-pressed="false">软萌</button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" id="lbl-count">一次生成几个</label>
+          <div class="pills" role="group" aria-labelledby="lbl-count">
+            <button type="button" class="pill" data-group="count" data-value="3" aria-pressed="false">3 个</button>
+            <button type="button" class="pill" data-group="count" data-value="6" aria-pressed="true">6 个</button>
+            <button type="button" class="pill" data-group="count" data-value="9" aria-pressed="false">9 个</button>
+          </div>
+        </div>
+        <div class="gen-foot">
+          <button type="button" class="btn btn-dark" id="btn-gen">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2c1.2 6 4.2 8.8 10 10-5.8 1.2-8.8 4-10 10-1.2-6-4.2-8.8-10-10 5.8-1.2 8.8-4 10-10z"/></svg>
+            重新生成名字
+          </button>
+          <span class="hint-line">已为 <b id="blessed2">28,431</b> 只毛孩子赐名 · 点卡片上的图标可复制或换一个</span>
+        </div>
+        <div class="relax-note" id="relax-note" role="status">筛选太严格，已自动放宽条件，保证名字管够。</div>
+        <div class="results" id="results" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 名字灵感 ============ -->
+  <section class="section inspo" id="inspo">
+    <div class="wrap">
+      <span class="eyebrow">Name Inspo · 名字灵感</span>
+      <h2 class="sec-title">看看大家都在起什么名</h2>
+      <p class="sec-sub">每天都有铲屎官从这里带走名字。以下是从名字库里随机抽的几位「人气选手」。</p>
+      <div class="inspo-grid" id="inspo-grid"></div>
+      <div class="inspo-foot">
+        <a class="btn btn-dark" href="#generator" data-scroll="generator">去给毛孩子挑一个</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 起名四步 ============ -->
+  <section class="section steps" id="steps">
+    <div class="wrap">
+      <span class="eyebrow">How It Works · 起名四步</span>
+      <h2 class="sec-title">给毛孩子起名，只需四步</h2>
+      <p class="sec-sub">不玄学，不纠结。跟着走，十分钟定案。</p>
+      <div class="steps-grid">
+        <div class="step">
+          <img src="https://aka.doubaocdn.com/s/rbG2CfdlX3" alt="蹲在地上捧着小猫观察的黑白线条插画" width="1024" height="1024">
+          <div class="step-num">STEP 01</div>
+          <h3>观察你的宠物</h3>
+          <p>性格、花色、怪癖、饭量……好名字都藏在这些细节里。</p>
+        </div>
+        <div class="step">
+          <img src="https://aka.doubaocdn.com/s/iuh9OlzV5U" alt="站在公告板前思考选择风格的黑白线条插画" width="1024" height="1024">
+          <div class="step-num">STEP 02</div>
+          <h3>选定风格</h3>
+          <p>可爱、文艺还是霸气？先把人设定下来，后面全靠它。</p>
+        </div>
+        <div class="step">
+          <img src="https://aka.doubaocdn.com/s/4ILAr1W7gr" alt="举着手机开心查看名字的黑白线条插画" width="1024" height="1024">
+          <div class="step-num">STEP 03</div>
+          <h3>一键生成</h3>
+          <p>选好类型和风格，点一下，候选名字直接送到手上。</p>
+        </div>
+        <div class="step">
+          <img src="https://aka.doubaocdn.com/s/VBvdxGVOnz" alt="戴着名牌项圈的小狗小猫并排坐着的黑白线条插画" width="1024" height="1024">
+          <div class="step-num">STEP 04</div>
+          <h3>喊三遍确认</h3>
+          <p>在门口大声喊三遍不尴尬，这个名字就稳了。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA 横幅 ============ -->
+  <section class="cta-band" id="cta">
+    <div class="wrap">
+      <h2>一个名字 + 一个毛孩子<br>= <mark>一辈子的故事</mark></h2>
+      <p>现在就去给毛孩子挑一个会喊八百遍的好名字，趁它还没习惯被叫「那个」。</p>
+      <a class="btn btn-dark" href="#generator" data-scroll="generator">开始起名</a>
+    </div>
+  </section>
+
+  <!-- ============ 常见问题 ============ -->
+  <section class="section faq" id="faq">
+    <div class="wrap">
+      <span class="eyebrow">FAQ · 常见问题</span>
+      <h2 class="sec-title">关于起名，你可能想问</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>为什么起个好名字这么重要？<span class="plus" aria-hidden="true"></span></summary>
+          <div class="faq-ans">名字是毛孩子一生里被喊得最多的词。一个好名字，喊起来顺口、听起来顺耳，全家也更容易统一口径——毕竟全家人得叫同一个名字，别到时候一人一个叫法。</div>
+        </details>
+        <details class="faq-item">
+          <summary>这些名字是怎么来的？<span class="plus" aria-hidden="true"></span></summary>
+          <div class="faq-ans">名字库由编辑手工整理，涵盖可爱、文艺、霸气、搞笑、吃货、古风、洋气、软萌八种风格，几百个常用名随你挑。你选什么类型和风格，它就往哪个方向筛选。</div>
+        </details>
+        <details class="faq-item">
+          <summary>名字会不会和别人家撞车？<span class="plus" aria-hidden="true"></span></summary>
+          <div class="faq-ans">热门名字确实容易撞。如果介意，可以在结果卡片上点「换一个」，多换几轮，撞车概率直线下降；也可以把风格组合选得刁钻一点，独一份的概率更高。</div>
+        </details>
+        <details class="faq-item">
+          <summary>能用它给宠物办登记吗？<span class="plus" aria-hidden="true"></span></summary>
+          <div class="faq-ans">当然可以。名字没有版权，疫苗本、宠物证、身份证上都随你写。不过建议先执行第四步——在门口喊三遍，不尴尬再定。</div>
+        </details>
+        <details class="faq-item">
+          <summary>生成出来不太满意怎么办？<span class="plus" aria-hidden="true"></span></summary>
+          <div class="faq-ans">直接点「重新生成」，或者只换掉某一格：卡片右上角的「换一个」会单独重抽那一格，不动其他名字。不满意就换，名字库管够。</div>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ 页脚 ============ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+        <a class="logo" href="#top" data-scroll="hero">
+          <span class="paw" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg>
+          </span>
+          宠名社
+        </a>
+        <p class="f-tagline">给每一个毛孩子，起一个配得上它一生的名字。</p>
+      </div>
+      <div class="f-col">
+        <h4>栏目</h4>
+        <a href="#generator" data-scroll="generator">起名神器</a>
+        <a href="#inspo" data-scroll="inspo">名字灵感</a>
+        <a href="#steps" data-scroll="steps">起名四步</a>
+        <a href="#faq" data-scroll="faq">常见问题</a>
+      </div>
+      <div class="f-col">
+        <h4>小贴士</h4>
+        <a href="#steps" data-scroll="steps">名字要顺口</a>
+        <a href="#steps" data-scroll="steps">避免谐音梗翻车</a>
+        <a href="#steps" data-scroll="steps">先喊三遍再定案</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 宠名社 · 名字仅供娱乐参考，最终解释权归毛孩子所有</span>
+      <span class="made">Made for 铲屎官，by 铲屎官。</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  /* ============ 名字库 ============ */
+  function N(n, m, g, s, p){
+    return { n:n, m:m, g:g||"any", s:s, p:p||["any"] };
+  }
+  var NAMES = [
+    /* ---- 可爱 ---- */
+    N("布丁","软软弹弹，甜过初恋。","any",["cute","food"]),
+    N("团子","圆滚滚的一团，只想揉脸。","any",["cute","soft"]),
+    N("奶糖","奶乎乎的甜，含在嘴里怕化了。","f",["cute"]),
+    N("汤圆","白白胖胖，团团圆圆。","any",["cute"]),
+    N("麻薯","Q弹软糯，治愈系担当。","any",["cute","food"]),
+    N("豆包","小小一只，皮薄馅大。","any",["cute"]),
+    N("肉球","四只肉垫，都是宝藏。","any",["cute"]),
+    N("球球","跑起来就是一个球。","any",["cute"]),
+    N("糯糯","性格软得像糯米糍。","any",["cute","soft"]),
+    N("圆圆","脸圆、眼圆、肚子圆。","any",["cute"]),
+    N("滚滚","一叫它，就咕噜咕噜滚过来。","any",["cute"]),
+    N("花生","香香脆脆的小可爱。","any",["cute"]),
+    N("芝麻","黑芝麻糊糊，越看越甜。","any",["cute"]),
+    N("芋圆","Q弹紫薯圆，甜度满分。","any",["cute","food"]),
+    N("棉花","软绵绵，轻飘飘。","any",["cute","soft"]),
+    N("泡泡","一蹦一跳，自带泡泡特效。","any",["cute"]),
+    N("糖糖","甜度超标的小宝贝。","f",["cute"]),
+    N("果冻","duang duang 弹，手感一绝。","any",["cute"]),
+    N("波波","活泼好动，快乐源泉。","any",["cute"]),
+    N("嘟嘟","嘴巴嘟嘟，谁看谁迷糊。","any",["cute"]),
+    N("崽崽","家里最小的崽，全家最爱的宝。","any",["cute","soft"]),
+    N("憨憨","呆萌担当，笑容治愈。","any",["cute","funny"]),
+    N("糯米","黏人精本人，走哪跟哪。","any",["cute","food"]),
+    N("雪球","白毛团子，冬天专属。","any",["cute"]),
+    N("毛球","掉毛季的移动毛毯。","any",["cute"]),
+    N("咚咚","走路咚咚咚，存在感拉满。","any",["cute"]),
+    N("奶油","丝滑香甜，软到心坎里。","f",["cute","food"]),
+    N("米粒","小小的，但很珍贵。","any",["cute"]),
+    N("麦麦","像麦子一样元气满满。","any",["cute"]),
+    N("小福","小小的福气，天天好运气。","any",["cute"]),
+    N("仓仓","仓鼠本鼠，圆滚滚。","any",["cute"],["hamster","any"]),
+    /* ---- 文艺 ---- */
+    N("千寻","出自《千与千寻》，永远迷路也永远温柔。","f",["artsy"]),
+    N("云深","云深不知处，气韵悠长。","m",["artsy"]),
+    N("半夏","半是夏天，半是清凉。","f",["artsy","ancient"]),
+    N("南风","南风知我意，吹梦到西洲。","any",["artsy"]),
+    N("听雨","闲时听雨，静待花开。","any",["artsy"]),
+    N("星河","眼里有星河，心里有远方。","any",["artsy"]),
+    N("拾光","把时光一片片拾起来珍藏。","any",["artsy"]),
+    N("初雪","第一场雪，纯净又珍贵。","any",["artsy"]),
+    N("晚风","傍晚的风，温柔又自由。","any",["artsy"]),
+    N("白露","二十四节气，清露为霜。","f",["artsy","ancient"]),
+    N("惊蛰","春雷一响，万物苏醒。","any",["artsy","ancient"]),
+    N("山茶","山茶花开，温柔而倔强。","f",["artsy"]),
+    N("木兰","花木兰的飒，也有温柔一面。","f",["artsy","ancient"]),
+    N("云朵","轻飘飘的，软乎乎的。","any",["artsy","soft"]),
+    N("烟青","烟雨青黛，如水墨画。","f",["artsy"]),
+    N("竹影","竹影婆娑，清雅安静。","any",["artsy"]),
+    N("眠眠","睡神本神，岁月静好。","any",["artsy","soft"]),
+    N("迟迟","慢慢来，比较快。","any",["artsy"]),
+    N("鹿鸣","呦呦鹿鸣，食野之苹。","any",["artsy","ancient"]),
+    N("青黛","远山青黛色，眉目皆含情。","f",["artsy"]),
+    N("子衿","青青子衿，悠悠我心。","any",["artsy","ancient"]),
+    N("未央","夜未央，乐未殇。","any",["artsy","ancient"]),
+    N("扶苏","山有扶苏，隰有荷华。","m",["artsy","ancient"]),
+    N("知夏","知了叫醒整个夏天。","f",["artsy"]),
+    N("望舒","《楚辞》里的月神车夫，气质清冷。","f",["artsy","ancient"]),
+    N("微澜","心湖微澜，涟漪不惊。","f",["artsy"]),
+    N("拾柒","十七岁的夏天，永远不过期。","f",["artsy"]),
+    N("南絮","南方柳絮，轻柔缱绻。","f",["artsy"]),
+    N("眠云","枕云而眠，闲适自得。","any",["artsy"]),
+    N("春深","春深似海，花开满枝。","any",["artsy","ancient"]),
+    N("云雀","云上的小雀，歌声清亮。","any",["artsy"],["bird","any"]),
+    /* ---- 霸气 ---- */
+    N("将军","出门遛弯，气场像巡街。","m",["boss"]),
+    N("元帅","统领全家，一呼百应。","m",["boss"]),
+    N("老板","家里真正的管理者。","any",["boss"]),
+    N("大哥","江湖地位，一口一个。","any",["boss"]),
+    N("老虎","小猫咪也要有大猫的排面。","any",["boss"]),
+    N("雷神","打雷天最淡定的那个。","m",["boss"]),
+    N("霸天","名字一喊，方圆三里安静。","m",["boss"]),
+    N("山大王","这片沙发归它管。","m",["boss"]),
+    N("王富贵","又土又豪，富贵逼人。","m",["boss","funny"]),
+    N("镇宅","一宠镇宅，百邪不侵。","any",["boss"]),
+    N("大爷","请安是每天的必修课。","any",["boss"]),
+    N("太后","全家的地位天花板。","f",["boss"]),
+    N("霸王","吃饭第一名，睡觉全屋最响。","m",["boss"]),
+    N("青龙","东方青龙，霸气侧漏。","m",["boss"]),
+    N("大圣","齐天大圣，无法无天。","m",["boss"]),
+    N("虎妞","猫中大姐头，狗中小霸王。","f",["boss"]),
+    N("黑豹","夜色里的一道闪电。","m",["boss"]),
+    N("御前","御前侍卫，寸步不离。","any",["boss"]),
+    N("万岁","喊一声，全家都得应。","m",["boss"]),
+    N("扛把子","小区遛弯界的天花板。","m",["boss","funny"]),
+    /* ---- 搞笑 ---- */
+    N("二狗","狗中王富贵，大智若愚。","m",["funny"]),
+    N("旺财","招财进宝，土得可爱。","m",["funny"]),
+    N("来福","来福来福，幸福自来。","m",["funny"]),
+    N("富贵","朴实无华，但很吉祥。","any",["funny"]),
+    N("铁柱","稳如铁柱，硬核担当。","m",["funny"]),
+    N("翠花","东北名媛，全村希望。","f",["funny"]),
+    N("狗蛋","贱名好养活，快乐加倍。","m",["funny"]),
+    N("大壮","体型与名字严重不符系列。","m",["funny"]),
+    N("泡面","三分钟热气，但永远真香。","any",["funny","food"]),
+    N("土豆","土土的，但很实在。","any",["funny","food"]),
+    N("地瓜","接地气的甜蜜担当。","any",["funny","food"]),
+    N("韭菜","割了一茬又一茬，生命力顽强。","any",["funny","food"]),
+    N("大葱","冲劲十足，气势拉满。","any",["funny","food"]),
+    N("拖鞋","最爱咬的，永远是拖鞋。","any",["funny"]),
+    N("拖把","扫地机器人平替。","any",["funny"]),
+    N("快递","一开门就冲，拆家第一名。","any",["funny"]),
+    N("外卖","看见你吃饭就两眼放光。","any",["funny"]),
+    N("沙发","沙发是它的，你只是借住。","any",["funny"]),
+    N("叉烧","家里的叉烧包，香喷喷。","any",["funny","food"]),
+    N("烧麦","皮薄馅多，笑口常开。","any",["funny","food"]),
+    N("阿呆","呆得可爱，萌得认真。","any",["funny"]),
+    N("卷心菜","看着呆，心里卷。","any",["funny","food"]),
+    N("愣头青","勇往直前，头铁担当。","m",["funny"]),
+    N("王中王","火腿肠之王，霸道又好笑。","m",["funny","food"]),
+    N("旺旺","汪汪队立大功，家喻户晓。","any",["funny"],["dog","any"]),
+    /* ---- 吃货 ---- */
+    N("奶茶","续命水，甜到心里。","any",["food"]),
+    N("泡芙","外表酥脆，内心柔软。","any",["food"]),
+    N("蛋挞","金黄酥脆，甜而不腻。","any",["food"]),
+    N("豆乳","豆浆的温柔，奶香四溢。","any",["food"]),
+    N("芋泥","绵密香甜，一口沦陷。","any",["food"]),
+    N("焦糖","微苦回甘，越品越香。","any",["food"]),
+    N("奶盖","咸甜交织，有点上头。","any",["food"]),
+    N("蛋糕","天天都是生日，快乐加倍。","any",["food"]),
+    N("饭团","小巧扎实，碳水快乐。","any",["food"]),
+    N("寿司","一口一个，精致美味。","any",["food"]),
+    N("乌冬","Q弹顺滑，治愈系。","any",["food"]),
+    N("拉面","深夜食堂，快乐加倍。","any",["food"]),
+    N("火锅","热闹滚烫，越煮越香。","any",["food"]),
+    N("烤肉","滋滋冒油，人间值得。","any",["food"]),
+    N("烤肠","路边摊之光，香气扑鼻。","any",["food"]),
+    N("鸡腿","永远吃不腻的快乐。","any",["food"]),
+    N("蛋堡","圆滚滚，香喷喷。","any",["food"]),
+    N("冰淇淋","甜甜凉凉，夏天的命。","any",["food"]),
+    N("珍珠","Q弹小珠，甜到心坎。","any",["food"]),
+    N("椰椰","清甜椰香，软萌加倍。","any",["food"]),
+    N("桃桃","粉粉嫩嫩，水灵灵。","f",["food"]),
+    N("芝士","浓郁拉丝，越嚼越香。","any",["food"]),
+    N("拿铁","丝滑醇香，微苦回甘。","any",["food"]),
+    N("摩卡","咖啡与巧克力的完美结合。","any",["food"]),
+    N("奥利奥","扭一扭，舔一舔，泡一泡。","any",["food"]),
+    N("旺仔","再看我就把你喝掉。","any",["food"]),
+    N("汤包","皮薄汁多，鲜掉眉毛。","any",["food"]),
+    N("糯米团","软糯香甜，一口满足。","any",["food"]),
+    N("花生酱","香浓丝滑，狗子最爱。","any",["food"]),
+    N("薯条","金黄酥脆，快乐加倍。","any",["food"]),
+    N("瓜子","一颗瓜子，幸福一天。","any",["food"],["hamster","any"]),
+    N("奶黄包","奶香流心，圆润可爱。","any",["food"]),
+    /* ---- 古风 ---- */
+    N("云锦","华美如云，锦绣人生。","f",["ancient"]),
+    N("玉衡","北斗七星之一，星辉清朗。","m",["ancient"]),
+    N("流光","流光容易把人抛，红了樱桃。","any",["ancient"]),
+    N("惊鸿","惊鸿一瞥，一眼万年。","any",["ancient"]),
+    N("忘机","忘机者，无巧思，纯粹自然。","any",["ancient"]),
+    N("花间","花间一壶酒，独酌无相亲。","f",["ancient"]),
+    N("明月","明月几时有，把酒问青天。","any",["ancient"]),
+    N("清风","清风徐来，水波不兴。","any",["ancient"]),
+    N("归晚","日晚倦梳头，归晚意迟迟。","any",["ancient"]),
+    N("青梧","凤凰栖青梧，吉祥高洁。","any",["ancient"]),
+    N("白芷","香草之名，清雅芬芳。","f",["ancient"]),
+    N("茯苓","药材之名，安神养生。","any",["ancient"]),
+    N("苏叶","紫苏叶，清香解表。","any",["ancient"]),
+    N("泽兰","兰之猗猗，扬扬其香。","f",["ancient"]),
+    N("佩兰","佩兰为饰，君子之香。","f",["ancient"]),
+    N("青禾","青青禾苗，生机勃勃。","any",["ancient"]),
+    N("南枝","南枝向暖，北枝向寒。","any",["ancient"]),
+    N("北冥","北冥有鱼，其名为鲲。","m",["ancient"]),
+    N("长歌","长歌当哭，快意人生。","any",["ancient"]),
+    N("听澜","静听波澜，心定如水。","any",["ancient"]),
+    N("望月","举头望月，思念无声。","any",["ancient"]),
+    N("竹喧","竹喧归浣女，莲动下渔舟。","any",["ancient"]),
+    N("松风","松风吹解带，山月照弹琴。","any",["ancient"]),
+    N("暮雪","柴门闻犬吠，风雪夜归人。","any",["ancient"]),
+    N("朝歌","朝气蓬勃，歌声嘹亮。","any",["ancient"]),
+    N("云舒","云卷云舒，去留无意。","any",["ancient"]),
+    N("鹤归","黄鹤一去不复返，归来仍是少年。","any",["ancient"]),
+    N("顾北","回首北望，豪情万丈。","m",["ancient"]),
+    N("安之","既来之，则安之。","any",["ancient"]),
+    N("洛水","洛水之畔，伊人如梦。","f",["ancient"]),
+    N("秋棠","秋海棠开，温柔缱绻。","f",["ancient"]),
+    /* ---- 洋气 ---- */
+    N("Milo","英文里最稳的狗名，没有之一。","m",["trendy"]),
+    N("Luna","月亮女神，自带仙气。","f",["trendy"]),
+    N("Coco","香奈儿本儿，精致到毛尖。","f",["trendy"]),
+    N("Lucky","幸运星本星，好运常在。","any",["trendy"]),
+    N("Cookie","小饼干，甜到掉牙。","any",["trendy"]),
+    N("Yuki","日语「雪」，软白可爱。","f",["trendy"]),
+    N("Momo","日系元气，古灵精怪。","any",["trendy"]),
+    N("Mochi","糯米糍，Q弹软萌。","any",["trendy"]),
+    N("Tofu","豆腐君，白白嫩嫩。","any",["trendy"]),
+    N("Nana","七酱，简单好喊。","f",["trendy"]),
+    N("Kiki","古灵精怪，活力满分。","any",["trendy"]),
+    N("Bubu","呆萌奶音，一喊就乐。","any",["trendy"]),
+    N("Dodo","傻乎乎，快乐加倍。","any",["trendy"]),
+    N("Mimi","国际通用猫名，经典永不过时。","f",["trendy"]),
+    N("Lulu","噜噜，软软糯糯。","f",["trendy"]),
+    N("Bingo","答对了！命中注定是你。","any",["trendy"]),
+    N("Whisky","威士忌，微醺又迷人。","m",["trendy"]),
+    N("Oreo","奥利奥，黑白分明。","any",["trendy"]),
+    N("Mango","芒果，甜到心里。","any",["trendy"]),
+    N("Peach","蜜桃，粉粉嫩嫩。","f",["trendy"]),
+    N("Kiwi","奇异果，酸酸甜甜。","any",["trendy"]),
+    N("Lemon","柠檬精，酸得可爱。","any",["trendy"]),
+    N("Pudding","布丁本丁，QQ弹弹。","any",["trendy"]),
+    N("Bubble","泡泡，轻盈可爱。","any",["trendy"]),
+    N("Noodle","面条，长长久久。","any",["trendy"]),
+    N("Popcorn","爆米花，越嚼越香。","any",["trendy"]),
+    N("Waffle","华夫饼，格子控最爱。","any",["trendy"]),
+    N("Taco","塔可，热辣欢脱。","any",["trendy"]),
+    N("Sushi","寿司，精致小巧。","any",["trendy"]),
+    N("Ramen","拉面，深夜的快乐。","any",["trendy"]),
+    /* ---- 软萌 ---- */
+    N("绵绵","绵绵软软，心都化了。","f",["soft"]),
+    N("软软","一摸就倒，一喊就应。","any",["soft"]),
+    N("奶昔","奶香浓郁，甜甜糯糯。","f",["soft"]),
+    N("棉棉","棉花糖本糖，软到不行。","f",["soft"]),
+    N("柔柔","轻声细语，温柔如水。","f",["soft"]),
+    N("小乖","乖得让人想亲一口。","any",["soft"]),
+    N("乖乖","全家认证的乖宝宝。","any",["soft"]),
+    N("甜甜","甜妹本甜，糖分超标。","f",["soft"]),
+    N("蜜糖","蜂蜜加糖，甜度拉满。","f",["soft"]),
+    N("糖豆","小糖豆，一口一个。","any",["soft"]),
+    N("毛豆","绿绿的小可爱，越看越萌。","any",["soft"]),
+    N("豆豆","小小的，软软的。","any",["soft"]),
+    N("咪咪","经典猫名，永不过时。","any",["soft"]),
+    N("喵喵","名字就是它的口头禅。","any",["soft"]),
+    N("汪汪","名字就是它的自我介绍。","any",["soft"]),
+    N("咩咩","软乎乎的羊咩咩。","any",["soft"]),
+    N("啾啾","小鸟本鸟，啾啾不停。","any",["soft"],["bird","any"]),
+    N("可可","可可爱爱，没有脑袋。","f",["soft"]),
+    N("兔兔","小兔子乖乖，把门开开。","any",["soft"],["rabbit","any"]),
+    N("果果","小果子，甜又脆。","f",["soft"]),
+    N("安安","平平安安，健康长大。","any",["soft"])
+  ];
+
+  var STYLE_LABEL = {cute:"可爱",artsy:"文艺",boss:"霸气",funny:"搞笑",food:"吃货",ancient:"古风",trendy:"洋气",soft:"软萌"};
+  var PET_LABEL = {cat:"猫",dog:"狗",rabbit:"兔子",hamster:"仓鼠",bird:"鸟",any:"通用"};
+  var GENDER_LABEL = {m:"男孩",f:"女孩",any:"不限"};
+
+  var state = { pet:"any", gender:"any", styles:[], count:6 };
+  var currentNames = [];
+
+  /* ============ 工具 ============ */
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function getPool(){
+    var byPet = NAMES.filter(function(x){ return x.p.indexOf(state.pet) > -1 || x.p.indexOf("any") > -1; });
+    var byGender = byPet.filter(function(x){ return state.gender === "any" || x.g === "any" || x.g === state.gender; });
+    var byStyle = state.styles.length
+      ? byGender.filter(function(x){ return x.s.some(function(k){ return state.styles.indexOf(k) > -1; }); })
+      : byGender;
+    var relaxed = false;
+    if(byStyle.length < state.count){ byStyle = byGender; relaxed = true; }
+    if(byStyle.length < state.count){ byStyle = byPet; relaxed = true; }
+    if(byStyle.length < state.count){ byStyle = NAMES; relaxed = true; }
+    return { pool: byStyle, relaxed: relaxed };
+  }
+
+  function petShownOf(item){
+    if(state.pet !== "any" && item.p.indexOf(state.pet) > -1) return state.pet;
+    var specific = item.p.filter(function(k){ return k !== "any"; });
+    return specific.length ? specific[0] : "any";
+  }
+
+  /* ============ 渲染 ============ */
+  var ICON_COPY = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  var ICON_SWAP = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>';
+  var ICON_CHECK = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg>';
+  var ICON_PAW = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg>';
+
+  function cardHTML(item, i){
+    var tags = item.s.slice(0, 3).map(function(k){ return '<span class="tag ' + k + '">' + STYLE_LABEL[k] + '</span>'; }).join("");
+    tags += '<span class="tag pet">' + PET_LABEL[petShownOf(item)] + '</span>';
+    return '' +
+      '<article class="rcard" style="animation-delay:' + (i * 55) + 'ms">' +
+        '<div class="rcard-top">' +
+          '<h4 class="rname">' + item.n + '</h4>' +
+          '<div class="ract">' +
+            '<button type="button" class="mini-btn" data-action="copy" data-name="' + item.n + '" aria-label="复制名字 ' + item.n + '" title="复制名字">' + ICON_COPY + '</button>' +
+            '<button type="button" class="mini-btn" data-action="swap" aria-label="换一个" title="换一个">' + ICON_SWAP + '</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="rcard-tags">' + tags + '</div>' +
+        '<p class="rmean">' + item.m + '</p>' +
+      '</article>';
+  }
+
+  function renderCards(list){
+    currentNames = list;
+    $("#results").innerHTML = list.map(cardHTML).join("");
+  }
+
+  function gen(){
+    var res = getPool();
+    var picked = shuffle(res.pool).slice(0, state.count);
+    renderCards(picked);
+    $("#relax-note").style.display = res.relaxed ? "block" : "none";
+    addBlessed(picked.length);
+  }
+
+  var blessed = 28431;
+  function addBlessed(n){
+    blessed += n;
+    var txt = blessed.toLocaleString("en-US");
+    $("#blessed").textContent = txt;
+    $("#blessed2").textContent = txt;
+  }
+
+  /* ============ 交互：筛选 pills ============ */
+  document.querySelectorAll(".pill[data-group]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var group = btn.getAttribute("data-group");
+      var value = btn.getAttribute("data-value");
+      if(group === "style"){
+        var idx = state.styles.indexOf(value);
+        if(idx > -1){ state.styles.splice(idx, 1); }
+        else { state.styles.push(value); }
+        btn.setAttribute("aria-pressed", state.styles.indexOf(value) > -1 ? "true" : "false");
+      } else {
+        if(group === "pet"){ state.pet = value; }
+        if(group === "gender"){ state.gender = value; }
+        if(group === "count"){ state.count = parseInt(value, 10); }
+        document.querySelectorAll('.pill[data-group="' + group + '"]').forEach(function(b){
+          b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+        });
+      }
+    });
+  });
+
+  $("#btn-gen").addEventListener("click", gen);
+
+  /* ============ 交互：卡片操作（事件委托） ============ */
+  $("#results").addEventListener("click", function(e){
+    var btn = e.target.closest("[data-action]");
+    if(!btn) return;
+    var action = btn.getAttribute("data-action");
+    var card = btn.closest(".rcard");
+    var idx = Array.prototype.indexOf.call(card.parentNode.children, card);
+
+    if(action === "copy"){
+      var name = btn.getAttribute("data-name");
+      copyText(name, btn);
+    }
+    if(action === "swap"){
+      var res = getPool();
+      var pool = res.pool.filter(function(x){ return x.n !== currentNames[idx].n; });
+      if(pool.length){
+        var fresh = pool[Math.floor(Math.random() * pool.length)];
+        currentNames[idx] = fresh;
+        card.outerHTML = cardHTML(fresh, idx);
+        addBlessed(1);
+        if(res.relaxed){ $("#relax-note").style.display = "block"; }
+      }
+    }
+  });
+
+  function copyText(text, btn){
+    function done(){
+      var old = btn.innerHTML;
+      btn.classList.add("done");
+      btn.innerHTML = ICON_CHECK;
+      setTimeout(function(){
+        btn.classList.remove("done");
+        btn.innerHTML = old;
+      }, 1500);
+    }
+    if(navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(done, function(){
+        fallbackCopy(text); done();
+      });
+    } else {
+      fallbackCopy(text); done();
+    }
+  }
+  function fallbackCopy(text){
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch(err){}
+    document.body.removeChild(ta);
+  }
+
+  /* ============ 灵感卡片 ============ */
+  var INSPO = [
+    { n:"团子", m:"软乎乎的糯米团子，一喊就想揉脸。", s:["cute"], bg:"#ffe3ee" },
+    { n:"望舒", m:"《楚辞》里的月神车夫，气质清冷。", s:["ancient"], bg:"#dcf4ff" },
+    { n:"将军", m:"出门遛狗，气场像巡街。", s:["boss"], bg:"#fff3cf" },
+    { n:"泡面", m:"三分钟热气，但永远真香。", s:["funny"], bg:"#ddf5e8" },
+    { n:"Mochi", m:"日语糯米糍，软萌到融化。", s:["trendy"], bg:"#ece8ff" },
+    { n:"二狗", m:"狗中王富贵，大智若愚的经典。", s:["funny"], bg:"#ffe8d9" },
+    { n:"奶茶", m:"续命水本水，甜到心里。", s:["food"], bg:"#ffe3ee" },
+    { n:"云深", m:"云深不知处，气韵悠长。", s:["artsy"], bg:"#dcf4ff" }
+  ];
+  $("#inspo-grid").innerHTML = INSPO.map(function(it){
+    var tags = it.s.map(function(k){ return '<span class="tag ' + k + '">' + STYLE_LABEL[k] + '</span>'; }).join("");
+    return '<article class="inspo-card" style="background:' + it.bg + '">' +
+      '<span class="paw-faint">' + ICON_PAW + '</span>' +
+      '<h3 class="iname">' + it.n + '</h3>' +
+      '<div class="rcard-tags">' + tags + '</div>' +
+      '<p class="imean">' + it.m + '</p>' +
+    '</article>';
+  }).join("");
+
+  /* ============ 平滑滚动 ============ */
+  document.querySelectorAll("[data-scroll]").forEach(function(a){
+    a.addEventListener("click", function(e){
+      var id = a.getAttribute("data-scroll");
+      var el = document.getElementById(id);
+      if(!el) return;
+      e.preventDefault();
+      var y = el.getBoundingClientRect().top + window.pageYOffset - 74;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    });
+  });
+
+  /* ============ 名词轮播 ============ */
+  var ROT = ["找对象","考驾照","装修新房","带娃写作业","抢演唱会门票"];
+  var rotIdx = 0;
+  var rotEl = document.getElementById("rotator");
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(rotEl && !reduceMotion){
+    setInterval(function(){
+      rotEl.classList.add("fade");
+      setTimeout(function(){
+        rotIdx = (rotIdx + 1) % ROT.length;
+        rotEl.textContent = ROT[rotIdx];
+        rotEl.classList.remove("fade");
+      }, 300);
+    }, 2400);
+  }
+
+  /* ============ 初始化 ============ */
+  gen();
+})();
+</script>
+</body>
+</html>
