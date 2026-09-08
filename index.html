@@ -4,25 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>宠物起名事务所｜给毛孩子起个好名字</title>
-<meta name="description" content="给猫、狗、兔子、仓鼠、小鸟起名字：按性格选风格，一键生成，支持复制。Hot take：给宠物起名，比给人起名还认真。">
-<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<meta name="description" content="给猫、狗、兔子、仓鼠、小鸟起名字：一键生成、AI 定制、收藏灵感。Hot take：给宠物起名，比给人起名还认真。">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
 <style>
   :root{
-    --ink:#161616;
-    --ink-soft:#4a4a4a;
-    --gray:#717171;
-    --line:#e8e8e4;
-    --accent:#00a9cc;
-    --accent-deep:#007e9c;
-    --pink:#ff6b9d;   --pink-bg:#ffe3ee;
-    --yellow:#ffc53d; --yellow-bg:#fff3cf;
-    --green:#3fae7a;  --green-bg:#ddf5e8;
-    --purple:#8b7cf6; --purple-bg:#ece8ff;
-    --orange:#ff8a4c; --orange-bg:#ffe8d9;
-    --cyan-bg:#dcf4ff;
-    --radius:18px;
+    --ink:#43302B;
+    --ink-soft:#7C665F;
+    --gray:#A08C85;
+    --line:#F3E4DA;
+    --accent:#FF8A5C;
+    --accent-deep:#F06E3D;
+    --pink:#FF8FA5;   --pink-bg:#FFE3E8;
+    --yellow:#FFBE5C; --yellow-bg:#FFF1D3;
+    --green:#6FC49B;  --green-bg:#DFF4E7;
+    --purple:#A58CF2; --purple-bg:#EDE8FD;
+    --orange:#FF9E64; --orange-bg:#FFEADD;
+    --blue:#7FB3E8;   --blue-bg:#DFF0FB;
+    --cream:#FFF8F1;
+    --peach:#FFF0E2;
+    --font-display:"ZCOOL KuaiLe","PingFang SC","Hiragino Sans GB",sans-serif;
+    --radius:22px;
     --maxw:1180px;
-    --shadow:0 12px 32px rgba(22,22,22,.10);
+    --shadow:0 14px 34px rgba(67,48,43,.12);
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
@@ -30,7 +33,7 @@
     margin:0;
     font-family:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
     color:var(--ink);
-    background:#ffffff;
+    background:var(--cream);
     line-height:1.65;
     -webkit-font-smoothing:antialiased;
   }
@@ -41,6 +44,11 @@
   :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
 
+  /* ============ 多画面 ============ */
+  .view{display:none;padding:clamp(40px,6vw,72px) 0}
+  .view.active{display:block}
+  .view-home{overflow:hidden}
+
   /* ============ 通用组件 ============ */
   .eyebrow{
     display:inline-flex;align-items:center;gap:10px;
@@ -48,36 +56,39 @@
     color:var(--accent-deep);
   }
   .eyebrow::before{content:"";width:22px;height:4px;border-radius:99px;background:var(--accent);flex:none}
-  h2.sec-title{font-size:clamp(30px,4vw,46px);font-weight:900;line-height:1.12;letter-spacing:-.01em;margin:14px 0 12px;text-wrap:balance}
+  h2.sec-title{
+    font-family:var(--font-display);font-weight:400;
+    font-size:clamp(32px,4.4vw,50px);line-height:1.18;letter-spacing:.01em;
+    margin:14px 0 12px;text-wrap:balance;
+  }
   .sec-sub{font-size:16px;color:var(--gray);max-width:58ch;margin:0}
-  .section{padding:clamp(64px,9vw,108px) 0}
 
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:10px;
-    border:2px solid var(--ink);border-radius:999px;
-    padding:14px 30px;font-size:16px;font-weight:800;cursor:pointer;
+    border:2.5px solid var(--ink);border-radius:999px;
+    padding:13px 30px;font-family:var(--font-display);font-weight:400;font-size:17px;cursor:pointer;
     transition:background .15s,color .15s,transform .15s,box-shadow .15s;
   }
   .btn-dark{background:var(--ink);color:#fff}
-  .btn-dark:hover{background:var(--accent);border-color:var(--accent)}
+  .btn-dark:hover{background:var(--accent);border-color:var(--accent);box-shadow:4px 4px 0 rgba(67,48,43,.2)}
   .btn-ghost{background:transparent;color:var(--ink)}
   .btn-ghost:hover{background:var(--ink);color:#fff}
   .btn:active{transform:translateY(2px)}
 
   .pill{
-    border:2px solid var(--ink);background:#fff;border-radius:999px;
-    padding:9px 20px;font-size:14px;font-weight:700;cursor:pointer;
+    border:2.5px solid var(--ink);background:#fff;border-radius:999px;
+    padding:9px 20px;font-family:var(--font-display);font-weight:400;font-size:15px;cursor:pointer;
     transition:background .15s,color .15s,transform .15s;
   }
   .pill:hover{transform:translateY(-2px)}
   .pill[aria-pressed="true"]{background:var(--ink);color:#fff}
 
   .tag{
-    display:inline-block;padding:3px 10px;border-radius:999px;
+    display:inline-block;padding:3px 11px;border-radius:999px;
     font-size:12px;font-weight:800;line-height:1.5;
   }
   .tag.cute{background:var(--pink-bg);color:var(--ink)}
-  .tag.artsy{background:var(--cyan-bg);color:var(--ink)}
+  .tag.artsy{background:var(--blue-bg);color:var(--ink)}
   .tag.boss{background:var(--yellow-bg);color:var(--ink)}
   .tag.funny{background:var(--green-bg);color:var(--ink)}
   .tag.food{background:var(--orange-bg);color:var(--ink)}
@@ -88,34 +99,53 @@
 
   mark{
     background:var(--accent);color:var(--ink);
-    padding:.05em .18em;border-radius:.14em;
+    padding:.06em .2em;border-radius:.16em;
     -webkit-box-decoration-break:clone;box-decoration-break:clone;
   }
+
+  /* 区块配图（贴纸感） */
+  .side-art{
+    width:172px;height:172px;object-fit:cover;flex:none;
+    border:3.5px solid var(--ink);border-radius:28px;
+    box-shadow:10px 10px 0 var(--yellow-bg);
+    transform:rotate(2.5deg);
+  }
+  .side-art.tilt-left{transform:rotate(-3deg);box-shadow:-10px 10px 0 var(--pink-bg)}
 
   /* ============ 导航 ============ */
   .nav{
     position:sticky;top:0;z-index:50;
-    background:rgba(255,255,255,.88);
+    background:rgba(255,248,241,.9);
     -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
-    border-bottom:1px solid var(--line);
+    border-bottom:2.5px solid var(--ink);
   }
   .nav-inner{display:flex;align-items:center;justify-content:space-between;height:70px}
-  .logo{display:inline-flex;align-items:center;gap:10px;font-size:20px;font-weight:900;letter-spacing:-.01em}
+  .logo{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:400;font-size:22px;letter-spacing:.01em;cursor:pointer}
   .logo .paw{color:var(--accent);display:inline-flex}
-  .nav-links{display:flex;gap:30px;align-items:center}
-  .nav-links a{font-size:15px;font-weight:600;color:var(--ink-soft);transition:color .15s}
-  .nav-links a:hover{color:var(--accent)}
-  .nav-cta{padding:10px 22px;font-size:14px}
+  .nav-links{display:flex;gap:24px;align-items:center}
+  .nav-links a{font-size:15px;font-weight:600;color:var(--ink-soft);transition:color .15s;cursor:pointer}
+  .nav-links a:hover{color:var(--accent-deep)}
+  .nav-links a.active{color:var(--accent-deep);font-weight:800}
+  .nav-cta{display:none}
 
-  /* ============ Hero ============ */
-  .hero{padding:clamp(56px,8vw,96px) 0 clamp(40px,6vw,72px)}
-  .hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:56px;align-items:center}
-  .hero h1{
-    font-size:clamp(38px,5.4vw,70px);font-weight:900;line-height:1.1;
-    letter-spacing:-.02em;margin:20px 0 18px;text-wrap:balance;
+  /* ============ 首页 Hero ============ */
+  .view-home{
+    background:
+      radial-gradient(520px 360px at 8% 10%, rgba(255,190,92,.32), transparent 70%),
+      radial-gradient(460px 320px at 94% 6%, rgba(255,143,165,.28), transparent 70%),
+      radial-gradient(560px 420px at 92% 78%, rgba(165,140,242,.16), transparent 70%),
+      radial-gradient(480px 360px at 4% 72%, rgba(111,196,155,.16), transparent 70%),
+      var(--cream);
   }
-  .hero-sub{font-size:17px;color:var(--ink-soft);max-width:46ch;margin:0}
-  .rotator-line{margin-top:14px;font-size:15px;color:var(--gray)}
+  .hero{padding:clamp(40px,6vw,72px) 0 clamp(30px,4vw,48px)}
+  .hero-inner{max-width:880px;margin:0 auto;text-align:center}
+  .hero h1{
+    font-family:var(--font-display);font-weight:400;
+    font-size:clamp(40px,5.6vw,74px);line-height:1.12;letter-spacing:.01em;
+    margin:20px auto 18px;text-wrap:balance;max-width:16em;
+  }
+  .hero-sub{font-size:17px;color:var(--ink-soft);max-width:48ch;margin:0 auto}
+  .rotator-line{margin-top:16px;font-size:15px;color:var(--gray)}
   .rotator-line b{
     font-weight:800;color:var(--ink);
     border-bottom:3px solid var(--accent);
@@ -123,23 +153,98 @@
     transition:opacity .3s;
   }
   .rotator-line b.fade{opacity:0}
-  .hero-actions{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+  .hero-actions{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap;justify-content:center}
   .hero-note{margin-top:16px;font-size:13px;color:var(--gray)}
-  .hero-art{position:relative}
+  .hero-note b{color:var(--accent-deep);font-weight:800}
+  .hero-art{position:relative;max-width:940px;margin:48px auto 0}
   .hero-art img{
-    width:100%;border:3px solid var(--ink);border-radius:26px;
-    box-shadow:12px 12px 0 var(--yellow);
+    width:100%;height:clamp(210px,40vw,400px);object-fit:cover;object-position:center 55%;
+    border:3.5px solid var(--ink);border-radius:32px;
+    box-shadow:14px 14px 0 var(--yellow);
   }
-  .deco-star{position:absolute;top:-22px;right:8%;color:var(--accent);transform:rotate(14deg)}
-  .deco-squiggle{position:absolute;bottom:-16px;left:-10px;color:var(--pink);transform:rotate(-6deg)}
-  .deco-dots{position:absolute;top:14px;left:-20px;color:var(--yellow)}
+  .deco-star{position:absolute;top:-24px;right:3%;color:var(--accent);transform:rotate(14deg)}
+  .deco-squiggle{position:absolute;bottom:-18px;left:-14px;color:var(--pink);transform:rotate(-6deg)}
+  .deco-dots{position:absolute;top:16px;left:-24px;color:var(--yellow)}
 
-  /* ============ 生成器 ============ */
-  .generator{background:#f7f7f4;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .gen-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:34px}
+  /* ============ 宠物跑马灯 ============ */
+  .marquee{
+    background:linear-gradient(90deg,var(--accent) 0%,#FF6B8A 100%);
+    overflow:hidden;padding:13px 0;margin:26px 0 0;
+    border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);
+    transform:rotate(-1.2deg) scale(1.02);
+  }
+  .marquee-track{display:flex;width:max-content;animation:marquee 26s linear infinite}
+  .marquee-group{display:flex;align-items:center;gap:20px;padding-right:20px}
+  .marquee img{width:44px;height:44px;border-radius:50%;border:2.5px solid var(--ink);object-fit:cover;flex:none}
+  .marquee-chip{
+    background:#fff;border:2.5px solid var(--ink);border-radius:999px;
+    padding:7px 18px;font-family:var(--font-display);font-weight:400;font-size:16px;
+    color:var(--ink);white-space:nowrap;box-shadow:3px 3px 0 rgba(67,48,43,.22);
+  }
+  .marquee-paw{color:#fff;display:inline-flex;flex:none}
+  @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ============ 统计条 ============ */
+  .stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:44px auto 0;max-width:980px}
+  .stat{
+    border:2.5px solid var(--ink);border-radius:20px;background:#fff;
+    padding:18px 20px;display:flex;flex-direction:column;gap:2px;
+    transition:transform .16s,box-shadow .16s;
+  }
+  .stat:hover{transform:translateY(-3px);box-shadow:6px 6px 0 rgba(255,138,92,.25)}
+  .stat b{font-family:var(--font-display);font-weight:400;font-size:30px;line-height:1.1;letter-spacing:.01em}
+  .stat span{font-size:13px;color:var(--gray);font-weight:600}
+  .stat:nth-child(1){background:var(--pink-bg)}
+  .stat:nth-child(2){background:var(--yellow-bg)}
+  .stat:nth-child(3){background:var(--green-bg)}
+  .stat:nth-child(4){background:var(--blue-bg)}
+
+  /* ============ 今日幸运名 ============ */
+  .daily-card{
+    border:3px dashed var(--ink);border-radius:32px;background:var(--yellow-bg);
+    padding:clamp(26px,4vw,40px);display:flex;align-items:center;justify-content:space-between;
+    gap:28px;position:relative;overflow:hidden;max-width:980px;margin:26px auto 0;
+  }
+  .daily-card .deco-star{top:-14px;right:4%;transform:rotate(14deg);color:var(--orange)}
+  .daily-left{max-width:56ch}
+  .daily-date{font-size:13px;font-weight:700;color:var(--gray);margin:10px 0 0}
+  .daily-name{font-family:var(--font-display);font-weight:400;font-size:clamp(32px,4.4vw,48px);margin:4px 0 8px;letter-spacing:.01em;line-height:1.12}
+  .daily-mean{font-size:15px;color:var(--ink-soft);margin:0 0 20px}
+  .daily-right{flex:none;display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+  .daily-note{font-size:12.5px;color:var(--gray);font-weight:600}
+
+  /* ============ 首页功能入口 ============ */
+  .entry-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;max-width:980px;margin:48px auto 0}
+  .entry-card{
+    display:flex;align-items:center;gap:18px;padding:26px 24px;position:relative;
+    background:var(--ec,#fff);border:3px solid var(--ink);border-radius:26px;
+    box-shadow:8px 8px 0 rgba(67,48,43,.16);cursor:pointer;
+    transition:transform .18s,box-shadow .18s;
+  }
+  .entry-card:hover{transform:translateY(-5px);box-shadow:12px 12px 0 rgba(67,48,43,.2)}
+  .entry-card:active{transform:translateY(0)}
+  .ec-icon{
+    width:64px;height:64px;border-radius:20px;background:#fff;
+    border:2.5px solid var(--ink);display:flex;align-items:center;justify-content:center;
+    flex:none;color:var(--ink);
+  }
+  .entry-card h3{font-family:var(--font-display);font-weight:400;font-size:23px;margin:0}
+  .entry-card p{font-size:13.5px;color:var(--ink-soft);margin:4px 0 0}
+  .ec-arrow{margin-left:auto;font-size:22px;font-weight:800;color:var(--ink-soft);transition:transform .18s;flex:none}
+  .entry-card:hover .ec-arrow{transform:translateX(6px)}
+  .ec-new{
+    position:absolute;top:-13px;right:18px;background:var(--ink);color:#fff;
+    font-size:11px;font-weight:800;padding:3px 12px;border-radius:999px;letter-spacing:.08em;
+  }
+
+  /* ============ 生成器 / AI 面板 ============ */
+  .view-generator{background:var(--peach)}
+  .gen-head{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:34px}
+  .gen-head .side-art{width:150px;height:150px}
+  .gen-head-right{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
   .panel{
-    background:#fff;border:3px solid var(--ink);border-radius:26px;
-    box-shadow:14px 14px 0 var(--accent);
+    background:#fff;border:3px solid var(--ink);border-radius:30px;
+    box-shadow:16px 16px 0 var(--orange-bg);
     padding:clamp(22px,3.4vw,38px);
   }
   .field{margin-bottom:24px}
@@ -155,25 +260,92 @@
     border:2.5px solid var(--ink);border-radius:var(--radius);background:#fff;
     padding:18px;display:flex;flex-direction:column;gap:10px;position:relative;
     transition:transform .16s,box-shadow .16s;
-    animation:rise .45s cubic-bezier(.2,.7,.3,1) backwards;
   }
-  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-  .rcard:hover{transform:translateY(-4px);box-shadow:8px 8px 0 rgba(0,169,204,.22)}
+  .rcard:hover{transform:translateY(-4px);box-shadow:8px 8px 0 rgba(255,138,92,.3)}
   .rcard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-  .rname{font-size:26px;font-weight:900;line-height:1.1;margin:0;letter-spacing:-.01em}
+  .rname{font-family:var(--font-display);font-weight:400;font-size:27px;line-height:1.12;margin:0;letter-spacing:.01em}
   .ract{display:flex;gap:8px;flex:none}
   .mini-btn{
     width:36px;height:36px;border:2px solid var(--ink);border-radius:11px;
     background:#fff;display:inline-flex;align-items:center;justify-content:center;
     cursor:pointer;transition:background .15s,transform .15s;
   }
-  .mini-btn:hover{background:var(--cyan-bg);transform:translateY(-2px)}
+  .mini-btn:hover{background:var(--orange-bg);transform:translateY(-2px)}
   .mini-btn.done{background:var(--green);color:#fff}
   .rcard-tags{display:flex;flex-wrap:wrap;gap:6px}
   .rmean{font-size:13.5px;color:var(--gray);margin:0;line-height:1.6}
+  .rmean-empty{font-size:12.5px;color:#B0A79B}
   .relax-note{display:none;margin-top:16px;font-size:13px;color:var(--accent-deep);font-weight:600}
 
-  /* ============ 灵感 ============ */
+  /* ============ AI 定制 ============ */
+  .view-ai{background:linear-gradient(180deg,#F4EEFF 0%,var(--cream) 55%)}
+  .ai-input{width:100%;border:2.5px solid var(--ink);border-radius:14px;padding:11px 14px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+  .ai-input:focus{outline:3px solid var(--accent);outline-offset:2px}
+  .ai-analyzing{display:none;margin-top:26px;background:#fff;border:2.5px solid var(--ink);border-radius:20px;padding:24px;text-align:center}
+  .ai-spark{display:inline-flex;color:var(--accent);animation:spin 1.6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .ai-step{font-family:var(--font-display);font-weight:400;font-size:19px;margin:12px 0 0;color:var(--accent-deep)}
+  .ai-bar-track{height:12px;border:2.5px solid var(--ink);border-radius:999px;background:var(--cream);overflow:hidden;margin-top:16px}
+  .ai-bar{width:0%;height:100%;background:linear-gradient(90deg,var(--accent),#FF6B8A);border-radius:999px;transition:width .45s ease}
+  .ai-results{display:none;margin-top:26px}
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+  .ai-why{
+    font-size:13px;color:var(--ink-soft);background:var(--pink-bg);
+    border-radius:12px;padding:10px 12px;margin:0;line-height:1.6;
+  }
+  .ai-why b{color:var(--accent-deep)}
+  .ai-src{font-size:12px;color:var(--gray);margin:8px 0 0;text-align:right}
+  .ai-note{grid-column:1/-1;font-size:13px;color:var(--accent-deep);background:var(--peach);border:2px dashed var(--accent);border-radius:12px;padding:10px 14px}
+  .ai-foot{text-align:center;margin-top:28px}
+  .ai-hint{font-size:13px;color:var(--gray);margin-top:14px}
+  .ai-status{display:flex;align-items:center;gap:10px;margin-bottom:18px;background:#fff;border:2.5px solid var(--ink);border-radius:16px;padding:12px 16px;font-size:13px;box-shadow:4px 4px 0 var(--ink);flex-wrap:wrap}
+  .ai-status-dot{width:10px;height:10px;border-radius:50%;background:#c9c9c9;flex:none}
+  .ai-status-dot.live{background:#3ECF8E;box-shadow:0 0 0 4px rgba(62,207,142,.22)}
+  .ai-status-dot.mock{background:#FFB020;box-shadow:0 0 0 4px rgba(255,176,32,.22)}
+  .ai-status-dot.off{background:#FF6B6B;box-shadow:0 0 0 4px rgba(255,107,107,.22)}
+  .ai-status strong{color:var(--accent-deep)}
+  .ai-summary{grid-column:1/-1;background:linear-gradient(90deg,var(--accent),#FF6B8A);color:#fff;border:2.5px solid var(--ink);border-radius:16px;padding:12px 16px;font-size:14px;box-shadow:4px 4px 0 var(--ink);line-height:1.6}
+  .ai-summary b{font-family:var(--font-display);font-weight:400;margin-right:2px}
+
+  /* ============ AI 对话聊天 ============ */
+  .chat-shell{background:#fff;border:2.5px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);overflow:hidden;display:flex;flex-direction:column}
+  .chat-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;background:linear-gradient(90deg,var(--accent),#FF6B8A);border-bottom:2.5px solid var(--ink);flex-wrap:wrap}
+  .chat-top-id{display:flex;align-items:center;gap:10px}
+  .chat-avatar{width:38px;height:38px;border-radius:50%;background:#fff;color:var(--accent-deep);display:flex;align-items:center;justify-content:center;border:2.5px solid var(--ink);flex:none}
+  .chat-name{font-family:var(--font-display);font-weight:400;font-size:17px;color:#fff;display:block;line-height:1.2}
+  .chat-sub{font-size:11.5px;color:rgba(255,255,255,.88);display:block;margin-top:2px}
+  .btn-sm{padding:6px 14px;font-size:12.5px;border-radius:999px}
+  .chat-box{height:min(52vh,520px);overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px;background:
+    radial-gradient(circle at 8% 12%,rgba(255,138,92,.09),transparent 34%),
+    radial-gradient(circle at 94% 86%,rgba(106,176,255,.09),transparent 32%),#FFFDF8}
+  .msg{display:flex;gap:9px;max-width:88%;animation:msgIn .28s ease}
+  @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .msg.user{align-self:flex-end;flex-direction:row-reverse}
+  .msg-av{width:30px;height:30px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;border:2px solid var(--ink)}
+  .msg.user .msg-av{background:var(--accent)}
+  .msg.ai .msg-av{background:var(--accent-deep)}
+  .msg-main{min-width:0;display:flex;flex-direction:column;gap:8px}
+  .msg-bub{padding:11px 14px;border-radius:16px;font-size:14px;line-height:1.65;white-space:pre-line;word-break:break-word}
+  .msg.user .msg-bub{background:var(--accent);color:#fff;border:2.5px solid var(--ink);border-top-right-radius:4px}
+  .msg.ai .msg-bub{background:#fff;border:2.5px solid var(--ink);border-top-left-radius:4px;box-shadow:3px 3px 0 rgba(26,26,26,.07)}
+  .msg-names{display:grid;gap:12px}
+  .msg-names .rcard{box-shadow:3px 3px 0 var(--ink)}
+  .chat-note{font-size:12.5px;color:var(--accent-deep);background:var(--peach);border:2px dashed var(--accent);border-radius:10px;padding:8px 12px;line-height:1.5}
+  .chat-typing{display:inline-flex;gap:5px;align-items:center;padding:4px 2px}
+  .chat-typing i{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:blink 1s infinite}
+  .chat-typing i:nth-child(2){animation-delay:.18s}
+  .chat-typing i:nth-child(3){animation-delay:.36s}
+  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  .chat-quick{display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px;border-top:2px dashed rgba(26,26,26,.14);background:#FFF7F0}
+  .chip{border:2px solid var(--ink);border-radius:999px;background:#fff;padding:6px 12px;font-size:12.5px;font-family:inherit;color:var(--ink);cursor:pointer;transition:transform .15s,background .15s}
+  .chip:hover{background:var(--peach);transform:translateY(-2px)}
+  .chat-input-row{display:flex;gap:10px;padding:12px 16px;border-top:2.5px solid var(--ink);background:#fff}
+  .chat-input{flex:1;min-width:0;border:2.5px solid var(--ink);border-radius:999px;padding:11px 16px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+  .chat-input:focus{outline:3px solid var(--accent);outline-offset:2px}
+  @media (max-width:600px){.chat-box{height:56vh}.msg{max-width:96%}}
+
+  /* ============ 名字灵感 ============ */
+  .sec-head{display:flex;align-items:center;justify-content:space-between;gap:26px;flex-wrap:wrap}
   .inspo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px;margin-top:38px}
   .inspo-card{
     border:2.5px solid var(--ink);border-radius:var(--radius);
@@ -181,45 +353,69 @@
     position:relative;overflow:hidden;
     transition:transform .16s,box-shadow .16s;
   }
-  .inspo-card:hover{transform:translateY(-4px);box-shadow:10px 10px 0 rgba(22,22,22,.14)}
+  .inspo-card:hover{transform:translateY(-4px);box-shadow:10px 10px 0 rgba(67,48,43,.15)}
   .inspo-card .paw-faint{position:absolute;right:-12px;top:-8px;color:var(--ink);opacity:.12;transform:rotate(-18deg)}
-  .iname{font-size:27px;font-weight:900;margin:0;line-height:1.1;letter-spacing:-.01em}
+  .iname{font-family:var(--font-display);font-weight:400;font-size:28px;margin:0;line-height:1.12;letter-spacing:.01em}
   .imean{font-size:14px;color:var(--ink-soft);margin:0;line-height:1.65}
   .inspo-foot{margin-top:34px;text-align:center}
-  .inspo-foot .btn{font-size:15px;padding:13px 28px}
+  .inspo-foot .btn{font-size:16px;padding:12px 28px}
 
-  /* ============ 步骤 ============ */
+  /* ============ 起名指南（四步 + 避坑） ============ */
+  .guide-steps{padding-bottom:clamp(48px,7vw,76px)}
   .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:44px}
   .step img{
-    width:100%;border:2.5px solid var(--ink);border-radius:20px;
+    width:100%;height:clamp(150px,22vw,260px);object-fit:cover;object-position:center;
+    border:3px solid var(--ink);border-radius:24px;
     transition:transform .16s,box-shadow .16s;
   }
-  .step:hover img{transform:translateY(-4px);box-shadow:8px 8px 0 rgba(0,169,204,.2)}
+  .step:hover img{transform:translateY(-4px);box-shadow:9px 9px 0 rgba(255,138,92,.3)}
   .step-num{font-weight:900;font-size:13px;letter-spacing:.12em;color:var(--accent-deep);margin-top:16px}
-  .step h3{font-size:19px;font-weight:800;margin:6px 0 4px}
+  .step h3{font-family:var(--font-display);font-weight:400;font-size:21px;margin:6px 0 4px}
   .step p{font-size:14px;color:var(--gray);margin:0}
+  .guide-tips{background:var(--peach);border-radius:34px;padding:clamp(30px,4vw,44px);margin-top:10px}
+  .tips-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:32px}
+  .tip-card{
+    border:2.5px solid var(--ink);border-radius:20px;background:#fff;padding:22px;
+    transition:transform .16s,box-shadow .16s;
+  }
+  .tip-card:hover{transform:translateY(-4px);box-shadow:8px 8px 0 rgba(255,158,100,.28)}
+  .tip-num{font-size:13px;font-weight:900;letter-spacing:.1em;color:var(--accent-deep)}
+  .tip-card h3{font-family:var(--font-display);font-weight:400;font-size:19px;margin:10px 0 6px}
+  .tip-card p{font-size:13.5px;color:var(--gray);margin:0;line-height:1.65}
 
   /* ============ CTA 横幅 ============ */
-  .cta-band{background:var(--accent);padding:clamp(70px,10vw,120px) 0;text-align:center}
+  .cta-band{
+    background:linear-gradient(135deg,var(--accent) 0%,#FF6B8A 100%);
+    padding:clamp(56px,8vw,84px) 0;position:relative;overflow:hidden;
+    border-radius:36px;margin-top:56px;
+  }
+  .cta-grid{display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap}
+  .cta-text{max-width:540px}
   .cta-band h2{
-    font-size:clamp(32px,4.6vw,58px);font-weight:900;line-height:1.15;
-    letter-spacing:-.015em;margin:0 0 16px;text-wrap:balance;
+    font-family:var(--font-display);font-weight:400;
+    font-size:clamp(32px,4.6vw,52px);line-height:1.18;
+    letter-spacing:.01em;margin:0 0 14px;text-wrap:balance;
   }
   .cta-band mark{background:#fff}
-  .cta-band p{font-size:17px;color:var(--ink-soft);margin:0 auto 30px;max-width:52ch}
+  .cta-band p{font-size:16.5px;color:rgba(67,48,43,.85);margin:0 0 26px;max-width:46ch}
   .cta-band .btn-dark{background:var(--ink);border-color:var(--ink);color:#fff}
-  .cta-band .btn-dark:hover{background:#fff;border-color:#fff;color:var(--ink)}
+  .cta-band .btn-dark:hover{background:#fff;border-color:#fff;color:var(--ink);box-shadow:4px 4px 0 rgba(67,48,43,.25)}
+  .cta-art{
+    width:clamp(240px,24vw,400px);height:auto;flex:none;
+    border:3.5px solid var(--ink);border-radius:32px;
+    box-shadow:12px 12px 0 rgba(255,255,255,.55);
+    transform:rotate(2.5deg);
+  }
 
   /* ============ FAQ ============ */
-  .faq{background:#fff;border-bottom:1px solid var(--line)}
   .faq-list{max-width:840px;margin:38px auto 0}
-  .faq-item{border:2px solid var(--ink);border-radius:16px;margin-bottom:14px;background:#fff;overflow:hidden}
+  .faq-item{border:2.5px solid var(--ink);border-radius:18px;margin-bottom:14px;background:#fff;overflow:hidden}
   .faq-item summary{
     list-style:none;cursor:pointer;padding:18px 22px;
     font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:16px;
   }
   .faq-item summary::-webkit-details-marker{display:none}
-  .faq-item summary:hover{background:#fafaf7}
+  .faq-item summary:hover{background:var(--cream)}
   .plus{
     width:28px;height:28px;border:2px solid var(--ink);border-radius:50%;
     position:relative;flex:none;transition:transform .2s,background .2s;
@@ -231,6 +427,28 @@
   .faq-item[open] summary{border-bottom:2px solid var(--line)}
   .faq-ans{padding:16px 22px 20px;font-size:15px;color:var(--ink-soft)}
 
+  /* ============ FAQ 底部斜贴联系卡 ============ */
+  .contact-note{
+    display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;
+    margin:40px auto 0;padding:16px 30px;max-width:600px;
+    background:var(--yellow);border:3px solid var(--ink);border-radius:20px;
+    transform:rotate(-2deg);position:relative;color:var(--ink);text-decoration:none;
+    box-shadow:9px 9px 0 var(--orange-bg);
+    transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+  }
+  .contact-note::before{
+    content:"";position:absolute;top:-13px;left:50%;transform:translateX(-50%) rotate(-2deg);
+    width:120px;height:26px;background:rgba(255,255,255,.5);
+    border:1.5px solid rgba(0,0,0,.08);
+  }
+  .contact-note:hover{transform:rotate(0deg) translateY(-3px);box-shadow:12px 12px 0 var(--accent);background:#FFE7A8}
+  .cn-ico{color:var(--accent-deep);display:inline-flex;flex:none}
+  .cn-text{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
+  .cn-text strong{font-family:var(--font-display);font-weight:400;font-size:21px;line-height:1.25;letter-spacing:.01em}
+  .cn-mail{font-weight:900;font-size:16px;color:var(--accent-deep);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+  .cn-go{font-size:21px;font-weight:900;color:var(--ink);flex:none;transition:transform .15s}
+  .contact-note:hover .cn-go{transform:translateX(5px)}
+
   /* ============ 页脚 ============ */
   .footer{background:var(--ink);color:#fff;padding:60px 0 30px}
   .footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px;margin-bottom:44px}
@@ -238,7 +456,7 @@
   .footer .logo .paw{color:var(--accent)}
   .f-tagline{font-size:14px;color:rgba(255,255,255,.72);max-width:34ch;margin:0}
   .f-col h4{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin:0 0 14px}
-  .f-col a{display:block;font-size:14.5px;color:rgba(255,255,255,.82);margin-bottom:10px;transition:color .15s}
+  .f-col a{display:block;font-size:14.5px;color:rgba(255,255,255,.82);margin-bottom:10px;transition:color .15s;cursor:pointer}
   .f-col a:hover{color:var(--accent)}
   .footer-bottom{
     border-top:1px solid rgba(255,255,255,.16);padding-top:22px;
@@ -247,54 +465,12 @@
   }
   .footer-bottom .made{font-weight:700;color:rgba(255,255,255,.85)}
 
-  /* ============ 统计条 ============ */
-  .stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:34px}
-  .stat{
-    border:2px solid var(--ink);border-radius:18px;background:#fff;
-    padding:18px 20px;display:flex;flex-direction:column;gap:2px;
-    transition:transform .16s,box-shadow .16s;
-  }
-  .stat:hover{transform:translateY(-3px);box-shadow:6px 6px 0 rgba(0,169,204,.18)}
-  .stat b{font-size:28px;font-weight:900;line-height:1.1;letter-spacing:-.01em}
-  .stat span{font-size:13px;color:var(--gray);font-weight:600}
-  .stat:nth-child(1){background:var(--cyan-bg)}
-  .stat:nth-child(2){background:var(--pink-bg)}
-  .stat:nth-child(3){background:var(--yellow-bg)}
-  .stat:nth-child(4){background:var(--green-bg)}
-
-  /* ============ 今日幸运名 ============ */
-  .daily{background:#fff;padding:clamp(44px,6vw,84px) 0}
-  .daily-card{
-    border:3px dashed var(--ink);border-radius:28px;background:var(--yellow-bg);
-    padding:clamp(26px,4vw,44px);display:flex;align-items:center;justify-content:space-between;
-    gap:28px;position:relative;overflow:hidden;
-  }
-  .daily-card .deco-star{top:-14px;right:4%;transform:rotate(14deg);color:var(--orange)}
-  .daily-left{max-width:56ch}
-  .daily-date{font-size:13px;font-weight:700;color:var(--gray);margin:10px 0 0}
-  .daily-name{font-size:clamp(30px,4vw,46px);font-weight:900;margin:4px 0 8px;letter-spacing:-.01em;line-height:1.12}
-  .daily-mean{font-size:15px;color:var(--ink-soft);margin:0 0 20px}
-  .daily-right{flex:none;display:flex;flex-direction:column;gap:12px;align-items:flex-end}
-  .daily-note{font-size:12.5px;color:var(--gray);font-weight:600}
-
-  /* ============ 避坑指南 ============ */
-  .tips{background:#f7f7f4;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .tips-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:40px}
-  .tip-card{
-    border:2px solid var(--ink);border-radius:18px;background:#fff;padding:22px;
-    transition:transform .16s,box-shadow .16s;
-  }
-  .tip-card:hover{transform:translateY(-4px);box-shadow:8px 8px 0 rgba(0,169,204,.18)}
-  .tip-num{font-size:13px;font-weight:900;letter-spacing:.1em;color:var(--accent-deep)}
-  .tip-card h3{font-size:17px;font-weight:800;margin:10px 0 6px}
-  .tip-card p{font-size:13.5px;color:var(--gray);margin:0;line-height:1.65}
-
   /* ============ 收藏夹 ============ */
   .fav-bar{
     position:fixed;left:50%;bottom:20px;transform:translateX(-50%);
     z-index:60;max-width:min(780px,calc(100vw - 32px));
     background:var(--ink);color:#fff;border-radius:999px;
-    box-shadow:0 14px 34px rgba(22,22,22,.3);
+    box-shadow:0 14px 34px rgba(67,48,43,.35);
     padding:10px 16px;
   }
   .fav-bar[hidden]{display:none}
@@ -318,17 +494,13 @@
   /* ============ 返回顶部 ============ */
   .to-top{
     position:fixed;right:22px;bottom:22px;z-index:60;
-    width:46px;height:46px;border-radius:14px;border:2px solid var(--ink);
+    width:46px;height:46px;border-radius:14px;border:2.5px solid var(--ink);
     background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
     opacity:0;pointer-events:none;transform:translateY(10px);
     transition:opacity .2s,transform .2s,background .15s;
   }
   .to-top.show{opacity:1;pointer-events:auto;transform:none}
   .to-top:hover{background:var(--accent);border-color:var(--accent);color:#fff}
-
-  /* ============ 滚动显现 ============ */
-  .reveal{opacity:0;transform:translateY(20px);transition:opacity .55s cubic-bezier(.2,.7,.3,1),transform .55s cubic-bezier(.2,.7,.3,1)}
-  .reveal.in{opacity:1;transform:none}
 
   .inspo-card .mini-btn{position:absolute;top:16px;right:16px}
   .mini-btn.faved{background:var(--pink);color:#fff}
@@ -337,8 +509,7 @@
 
   /* ============ 响应式 ============ */
   @media (max-width:980px){
-    .hero-grid{grid-template-columns:1fr;gap:48px}
-    .hero-art{max-width:520px;margin:0 auto}
+    .hero-art{max-width:680px;margin-left:auto;margin-right:auto}
     .steps-grid{grid-template-columns:repeat(2,1fr)}
     .tips-grid{grid-template-columns:repeat(2,1fr)}
     .footer-top{grid-template-columns:1fr 1fr}
@@ -347,15 +518,19 @@
   }
   @media (max-width:820px){
     .nav-links{display:none}
+    .marquee{transform:none}
   }
   @media (max-width:560px){
     .steps-grid{grid-template-columns:1fr}
     .tips-grid{grid-template-columns:1fr}
     .stat-strip{grid-template-columns:repeat(2,1fr);gap:12px}
+    .entry-grid{grid-template-columns:1fr}
     .footer-top{grid-template-columns:1fr}
     .hero-actions .btn{flex:1}
-    .panel{box-shadow:8px 8px 0 var(--accent)}
+    .panel{box-shadow:10px 10px 0 var(--orange-bg)}
     .fav-bar{border-radius:22px}
+    .marquee img{width:36px;height:36px}
+    .marquee-chip{font-size:14px;padding:6px 14px}
   }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:.001s !important;transition-duration:.001s !important}
@@ -368,68 +543,176 @@
 <!-- ============ 导航 ============ -->
 <header class="nav">
   <div class="wrap nav-inner">
-    <a class="logo" href="#top" data-scroll="hero">
+    <a class="logo" href="#home" data-view="home">
       <span class="paw" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg>
       </span>
       宠名社
     </a>
     <nav class="nav-links" aria-label="主导航">
-      <a href="#generator" data-scroll="generator">起名神器</a>
-      <a href="#inspo" data-scroll="inspo">名字灵感</a>
-      <a href="#steps" data-scroll="steps">起名四步</a>
-      <a href="#faq" data-scroll="faq">常见问题</a>
-      <a class="btn btn-dark nav-cta" href="#generator" data-scroll="generator">开始起名</a>
+      <a class="active" href="#home" data-view="home">首页</a>
+      <a href="#generator" data-view="generator">起名神器</a>
+      <a href="#inspo" data-view="inspo">名字灵感</a>
+      <a href="#guide" data-view="guide">起名指南</a>
+      <a href="#faq" data-view="faq">常见问题</a>
     </nav>
   </div>
 </header>
 
-<main id="top">
-  <!-- ============ Hero ============ -->
-  <section class="hero" id="hero">
-    <div class="wrap hero-grid">
-      <div>
-        <span class="eyebrow">Pet Naming Studio · 宠物起名事务所</span>
-        <h1>Hot take: 给宠物起名，<mark>比给人起名</mark> 还认真。</h1>
-        <p class="hero-sub">名字会陪它走完这一生，还会被你每天喊八百遍。选得好不好，毛孩子心里有数。</p>
-        <p class="rotator-line">起名难度，不亚于——<b id="rotator" aria-live="off">找对象</b></p>
-        <div class="hero-actions">
-          <a class="btn btn-dark" href="#generator" data-scroll="generator">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg>
-            开始起名
-          </a>
-          <a class="btn btn-ghost" href="#inspo" data-scroll="inspo">看看名字灵感</a>
+<main>
+
+  <!-- ============ 画面：首页 ============ -->
+  <section class="view active view-home" id="view-home">
+    <div class="hero" id="hero">
+      <div class="wrap">
+        <div class="hero-inner">
+          <span class="eyebrow">Pet Naming Studio · 宠物起名事务所</span>
+          <h1>Hot take: 给宠物起名，<mark>比给人起名</mark> 还认真。</h1>
+          <p class="hero-sub">名字会陪它走完这一生，还会被你每天喊八百遍。选得好不好，毛孩子心里有数。</p>
+          <p class="rotator-line">起名难度，不亚于——<b id="rotator" aria-live="off">找对象</b></p>
+          <div class="hero-actions">
+            <a class="btn btn-dark" href="#generator" data-view="generator">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg>
+              开始起名
+            </a>
+            <a class="btn btn-ghost" href="#ai" data-view="ai">试试 AI 定制</a>
+          </div>
+          <p class="hero-note">免费 · 无需注册 · 已为 <b id="blessed">28,431</b> 只毛孩子赐名</p>
         </div>
-        <p class="hero-note">免费 · 无需注册 · 已为 <b id="blessed">28,431</b> 只毛孩子赐名</p>
+        <div class="hero-art">
+          <svg class="deco-star" viewBox="0 0 24 24" width="52" height="52" fill="currentColor" aria-hidden="true"><path d="M12 2c1.2 6 4.2 8.8 10 10-5.8 1.2-8.8 4-10 10-1.2-6-4.2-8.8-10-10 5.8-1.2 8.8-4 10-10z"/></svg>
+          <svg class="deco-dots" width="60" height="24" viewBox="0 0 60 24" fill="currentColor" aria-hidden="true"><circle cx="6" cy="6" r="3.4"/><circle cx="24" cy="16" r="3.4"/><circle cx="44" cy="5" r="3.4"/><circle cx="56" cy="17" r="2.6"/></svg>
+          <img src="https://aka.doubaocdn.com/s/3p8VewWVuV" alt="橘猫、奶牛猫、奶油小狗和柴犬排排站戴着名牌项圈的暖萌卡通插画" width="2457" height="1024">
+          <svg class="deco-squiggle" viewBox="0 0 80 24" width="110" height="32" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" aria-hidden="true"><path d="M4 16C16 6 26 22 38 12s20 10 38 0"/></svg>
+        </div>
       </div>
-      <div class="hero-art">
-        <svg class="deco-star" viewBox="0 0 24 24" width="46" height="46" fill="currentColor" aria-hidden="true"><path d="M12 2c1.2 6 4.2 8.8 10 10-5.8 1.2-8.8 4-10 10-1.2-6-4.2-8.8-10-10 5.8-1.2 8.8-4 10-10z"/></svg>
-        <svg class="deco-dots" width="60" height="24" viewBox="0 0 60 24" fill="currentColor" aria-hidden="true"><circle cx="6" cy="6" r="3.4"/><circle cx="24" cy="16" r="3.4"/><circle cx="44" cy="5" r="3.4"/><circle cx="56" cy="17" r="2.6"/></svg>
-        <img src="https://aka.doubaocdn.com/s/xbIeTKSvIW" alt="两只戴着名牌项圈的猫咪的拼贴插画" width="1024" height="1024">
-        <svg class="deco-squiggle" viewBox="0 0 80 24" width="110" height="32" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" aria-hidden="true"><path d="M4 16C16 6 26 22 38 12s20 10 38 0"/></svg>
+    </div>
+
+    <!-- 宠物跑马灯 -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <div class="marquee-group">
+          <img src="https://aka.doubaocdn.com/s/RrAv4FLf63" alt="" width="512" height="512">
+          <span class="marquee-chip">喵喵队立大功</span>
+          <img src="https://aka.doubaocdn.com/s/RQabU71sSn" alt="" width="512" height="512">
+          <span class="marquee-chip">汪汪队出发</span>
+          <span class="marquee-paw"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg></span>
+          <span class="marquee-chip">今日幸运名</span>
+          <img src="https://aka.doubaocdn.com/s/RrAv4FLf63" alt="" width="512" height="512">
+          <span class="marquee-chip">一键起名</span>
+          <img src="https://aka.doubaocdn.com/s/RQabU71sSn" alt="" width="512" height="512">
+          <span class="marquee-chip">收藏不丢</span>
+          <span class="marquee-paw"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg></span>
+          <span class="marquee-chip">免费 · 无限用</span>
+        </div>
+        <div class="marquee-group">
+          <img src="https://aka.doubaocdn.com/s/RrAv4FLf63" alt="" width="512" height="512">
+          <span class="marquee-chip">喵喵队立大功</span>
+          <img src="https://aka.doubaocdn.com/s/RQabU71sSn" alt="" width="512" height="512">
+          <span class="marquee-chip">汪汪队出发</span>
+          <span class="marquee-paw"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg></span>
+          <span class="marquee-chip">今日幸运名</span>
+          <img src="https://aka.doubaocdn.com/s/RrAv4FLf63" alt="" width="512" height="512">
+          <span class="marquee-chip">一键起名</span>
+          <img src="https://aka.doubaocdn.com/s/RQabU71sSn" alt="" width="512" height="512">
+          <span class="marquee-chip">收藏不丢</span>
+          <span class="marquee-paw"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg></span>
+          <span class="marquee-chip">免费 · 无限用</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 统计条 -->
+    <div class="wrap">
+      <div class="stat-strip" role="list" aria-label="网站数据">
+        <div class="stat"><b id="stat-names">210+</b><span>精选名字</span></div>
+        <div class="stat"><b id="stat-8">8</b><span>种起名风格</span></div>
+        <div class="stat"><b id="stat-6">6</b><span>类宠物适用</span></div>
+        <div class="stat"><b>∞</b><span>种组合可能</span></div>
+      </div>
+
+      <!-- 今日幸运名 -->
+      <div class="daily-card">
+        <svg class="deco-star" viewBox="0 0 24 24" width="42" height="42" fill="currentColor" aria-hidden="true"><path d="M12 2c1.2 6 4.2 8.8 10 10-5.8 1.2-8.8 4-10 10-1.2-6-4.2-8.8-10-10 5.8-1.2 8.8-4 10-10z"/></svg>
+        <div class="daily-left">
+          <span class="eyebrow">Daily Pick · 今日幸运名</span>
+          <p class="daily-date" id="daily-date"></p>
+          <h3 class="daily-name" id="daily-name"></h3>
+          <p class="daily-mean" id="daily-mean"></p>
+          <button type="button" class="btn btn-dark" id="daily-copy">复制这个名字</button>
+        </div>
+        <div class="daily-right">
+          <div class="rcard-tags" id="daily-tags"></div>
+          <span class="daily-note">按日期随机 · 每天不重样 · 信则灵</span>
+        </div>
+      </div>
+
+      <!-- 功能入口 -->
+      <div class="entry-grid">
+        <a class="entry-card" href="#generator" data-view="generator" style="--ec:#FFD9C4">
+          <span class="ec-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg></span>
+          <div>
+            <h3>起名神器</h3>
+            <p>按类型、性别、风格一键生成，命中数实时看</p>
+          </div>
+          <span class="ec-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="entry-card" href="#ai" data-view="ai" style="--ec:#E4D9FB">
+          <span class="ec-new" aria-hidden="true">NEW</span>
+          <span class="ec-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><path d="M12 2c1.2 6 4.2 8.8 10 10-5.8 1.2-8.8 4-10 10-1.2-6-4.2-8.8-10-10 5.8-1.2 8.8-4 10-10z"/></svg></span>
+          <div>
+            <h3>AI 定制起名</h3>
+            <p>说出性格和心愿，AI 帮你量身定制专属名</p>
+          </div>
+          <span class="ec-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="entry-card" href="#inspo" data-view="inspo" style="--ec:#FFEDC2">
+          <span class="ec-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5C6.5 16.7 3 13.4 3 9.9 3 7.2 5.2 5 7.9 5c1.6 0 3.1.8 4.1 2.1C13 5.8 14.5 5 16.1 5 18.8 5 21 7.2 21 9.9c0 3.5-3.5 6.8-9 10.6z"/></svg></span>
+          <div>
+            <h3>名字灵感</h3>
+            <p>铲屎官们都在起什么名？人气选手随时抄作业</p>
+          </div>
+          <span class="ec-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="entry-card" href="#guide" data-view="guide" style="--ec:#CDEBDB">
+          <span class="ec-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6 4 8 4 10 5.5v13C8 17 6 17 4 18.5z"/><path d="M20 5.5C18 4 16 4 14 5.5v13c2-1.5 4-1.5 6 0z"/></svg></span>
+          <div>
+            <h3>起名指南</h3>
+            <p>四步起名法 + 避坑指南，少走冤枉路</p>
+          </div>
+          <span class="ec-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-band">
+        <div class="cta-grid">
+          <div class="cta-text">
+            <h2>一个名字 + 一个毛孩子<br>= <mark>一辈子的故事</mark></h2>
+            <p>现在就去给毛孩子挑一个会喊八百遍的好名字，趁它还没习惯被叫「那个」。</p>
+            <a class="btn btn-dark" href="#generator" data-view="generator">开始起名</a>
+          </div>
+          <img class="cta-art" src="https://aka.doubaocdn.com/s/xq1eZHTUKx" alt="小狗和小猫击掌庆祝的暖萌卡通插画" width="1024" height="1024">
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ 起名神器 ============ -->
-  <section class="section generator" id="generator">
+  <!-- ============ 画面：起名神器 ============ -->
+  <section class="view view-generator" id="view-generator">
     <div class="wrap">
-      <div class="gen-head reveal">
+      <div class="gen-head v-anim">
         <div>
           <span class="eyebrow">Name Generator · 起名神器</span>
           <h2 class="sec-title">选好毛孩子的类型和风格，<br>剩下的交给它。</h2>
         </div>
-        <p class="sec-sub">几百个编辑手挑的名字，按宠物类型、性别与风格即时筛选，随机抽取，绝对公平。</p>
+        <div class="gen-head-right">
+          <img class="side-art tilt-left" src="https://aka.doubaocdn.com/s/gYkAoDXn6v" alt="小猫和小狗趴在桌边看空白纸张的暖萌卡通插画" width="1024" height="1024">
+          <p class="sec-sub">几百个编辑手挑的名字，按宠物类型、性别与风格即时筛选，随机抽取，绝对公平。</p>
+        </div>
       </div>
 
-      <div class="stat-strip reveal" role="list" aria-label="网站数据">
-        <div class="stat"><b id="stat-names">210+</b><span>精选名字</span></div>
-        <div class="stat"><b>8</b><span>种起名风格</span></div>
-        <div class="stat"><b>6</b><span>类宠物适用</span></div>
-        <div class="stat"><b>∞</b><span>种组合可能</span></div>
-      </div>
-
-      <div class="panel reveal">
+      <div class="panel v-anim">
         <div class="field">
           <label class="field-label" id="lbl-pet">宠物类型</label>
           <div class="pills" role="group" aria-labelledby="lbl-pet">
@@ -483,120 +766,149 @@
     </div>
   </section>
 
-  <!-- ============ 今日幸运名 ============ -->
-  <section class="daily" id="daily">
+  <!-- ============ 画面：AI 定制 ============ -->
+  <section class="view view-ai" id="view-ai">
     <div class="wrap">
-      <div class="daily-card reveal">
-        <svg class="deco-star" viewBox="0 0 24 24" width="42" height="42" fill="currentColor" aria-hidden="true"><path d="M12 2c1.2 6 4.2 8.8 10 10-5.8 1.2-8.8 4-10 10-1.2-6-4.2-8.8-10-10 5.8-1.2 8.8-4 10-10z"/></svg>
-        <div class="daily-left">
-          <span class="eyebrow">Daily Pick · 今日幸运名</span>
-          <p class="daily-date" id="daily-date"></p>
-          <h3 class="daily-name" id="daily-name"></h3>
-          <p class="daily-mean" id="daily-mean"></p>
-          <button type="button" class="btn btn-dark" id="daily-copy">复制这个名字</button>
+      <div class="gen-head v-anim">
+        <div>
+          <span class="eyebrow">AI Naming · AI 定制起名</span>
+          <h2 class="sec-title">告诉 AI 你家的毛孩子，<br>让它挑出最合心意的一个。</h2>
         </div>
-        <div class="daily-right">
-          <div class="rcard-tags" id="daily-tags"></div>
-          <span class="daily-note">按日期随机 · 每天不重样 · 信则灵</span>
+        <div class="gen-head-right">
+          <img class="side-art" src="https://aka.doubaocdn.com/s/gmvrPTV3s9" alt="小猫小狗围着发光的魔法水晶球的暖萌卡通插画" width="1024" height="1024">
+          <p class="sec-sub">性格、心愿、字数偏好全都能说。AI 会结合名字寓意与风格，给你带理由的专属推荐。</p>
+        </div>
+      </div>
+
+      <div class="ai-status v-anim" id="ai-status" role="status">
+        <span class="ai-status-dot" id="ai-status-dot" aria-hidden="true"></span>
+        <span id="ai-status-text">正在检测 AI Agent…</span>
+      </div>
+
+      <div class="chat-shell v-anim">
+        <div class="chat-top">
+          <div class="chat-top-id">
+            <span class="chat-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2c1.2 6 4.2 8.8 10 10-5.8 1.2-8.8 4-10 10-1.2-6-4.2-8.8-10-10 5.8-1.2 8.8-4 10-10z"/></svg></span>
+            <div>
+              <b class="chat-name">起名小助手</b>
+              <small class="chat-sub">聊着聊着，名字就出来了</small>
+            </div>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" id="chat-new">新对话</button>
+        </div>
+
+        <div class="chat-box" id="chat-box" aria-live="polite"></div>
+
+        <div class="chat-quick" id="chat-quick">
+          <button type="button" class="chip" data-say="我养了只橘猫，特别粘人">橘猫 · 粘人</button>
+          <button type="button" class="chip" data-say="给我家柯基起个霸气的名字">柯基 · 霸气</button>
+          <button type="button" class="chip" data-say="想要两个字的文艺名字">两字 · 文艺</button>
+          <button type="button" class="chip" data-say="我家鹦鹉超会学人说话">鹦鹉 · 话痨</button>
+        </div>
+
+        <form class="chat-input-row" id="chat-form" autocomplete="off">
+          <input class="chat-input" id="chat-input" type="text" maxlength="80"
+            placeholder="跟它聊聊你家宝贝，比如「一只橘猫，特别粘人」" aria-label="跟 AI 说点什么">
+          <button type="submit" class="btn btn-dark" id="chat-send">发送</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 画面：名字灵感 ============ -->
+  <section class="view" id="view-inspo">
+    <div class="wrap">
+      <div class="sec-head v-anim">
+        <div>
+          <span class="eyebrow">Name Inspo · 名字灵感</span>
+          <h2 class="sec-title">看看大家都在起什么名</h2>
+          <p class="sec-sub">每天都有铲屎官从这里带走名字。以下是从名字库里随机抽的几位「人气选手」。</p>
+        </div>
+        <img class="side-art" src="https://aka.doubaocdn.com/s/7ehiicnpm7" alt="橘猫和奶油小狗依偎着看书的暖萌卡通插画" width="1024" height="1024">
+      </div>
+      <div class="inspo-grid v-anim" id="inspo-grid"></div>
+      <div class="inspo-foot v-anim">
+        <a class="btn btn-dark" href="#generator" data-view="generator">去给毛孩子挑一个</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 画面：起名指南 ============ -->
+  <section class="view" id="view-guide">
+    <div class="wrap">
+      <div class="guide-steps">
+        <span class="eyebrow v-anim">How It Works · 起名四步</span>
+        <h2 class="sec-title v-anim">给毛孩子起名，只需四步</h2>
+        <p class="sec-sub v-anim">不玄学，不纠结。跟着走，十分钟定案。</p>
+        <div class="steps-grid v-anim">
+          <div class="step">
+            <img src="https://aka.doubaocdn.com/s/Q7i8K6htsq" alt="蹲在地上捧着小猫观察的暖萌卡通插画" width="1024" height="1024">
+            <div class="step-num">STEP 01</div>
+            <h3>观察你的宠物</h3>
+            <p>性格、花色、怪癖、饭量……好名字都藏在这些细节里。</p>
+          </div>
+          <div class="step">
+            <img src="https://aka.doubaocdn.com/s/U3eifKWWoH" alt="站在公告板前思考选择风格的暖萌卡通插画" width="1024" height="1024">
+            <div class="step-num">STEP 02</div>
+            <h3>选定风格</h3>
+            <p>可爱、文艺还是霸气？先把人设定下来，后面全靠它。</p>
+          </div>
+          <div class="step">
+            <img src="https://aka.doubaocdn.com/s/Ki7im4gD7H" alt="举着手机开心查看名字的暖萌卡通插画" width="1024" height="1024">
+            <div class="step-num">STEP 03</div>
+            <h3>一键生成</h3>
+            <p>选好类型和风格，点一下，候选名字直接送到手上。</p>
+          </div>
+          <div class="step">
+            <img src="https://aka.doubaocdn.com/s/XDsJiRXJb0" alt="戴着名牌项圈的小狗小猫并排坐着的暖萌卡通插画" width="1024" height="1024">
+            <div class="step-num">STEP 04</div>
+            <h3>喊三遍确认</h3>
+            <p>在门口大声喊三遍不尴尬，这个名字就稳了。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-tips">
+        <span class="eyebrow v-anim">Tips · 起名避坑指南</span>
+        <h2 class="sec-title v-anim">起名四连问，帮你少踩坑</h2>
+        <p class="sec-sub v-anim">编辑起名五百次后总结的几条血泪经验，字字珠玑。</p>
+        <div class="tips-grid v-anim">
+          <div class="tip-card">
+            <div class="tip-num">TIP 01</div>
+            <h3>谐音梗先查字典</h3>
+            <p>「好养」「旺财」听着顺口，但先默念三遍，确认不会变成尴尬的谐音。</p>
+          </div>
+          <div class="tip-card">
+            <div class="tip-num">TIP 02</div>
+            <h3>别起喊不出口的名</h3>
+            <p>在小区门口大喊测试一下。喊不出口的名字，早晚会变成「那个」。</p>
+          </div>
+          <div class="tip-card">
+            <div class="tip-num">TIP 03</div>
+            <h3>慎用生僻字</h3>
+            <p>宠物医院挂号、疫苗本登记，总得让人念得出来、打得出来。</p>
+          </div>
+          <div class="tip-card">
+            <div class="tip-num">TIP 04</div>
+            <h3>两字名更好喊</h3>
+            <p>两个字顺口，三个字有范儿。先定好音节，再选字，喊起来更响亮。</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ 名字灵感 ============ -->
-  <section class="section inspo" id="inspo">
+  <!-- ============ 画面：常见问题 ============ -->
+  <section class="view" id="view-faq">
     <div class="wrap">
-      <span class="eyebrow">Name Inspo · 名字灵感</span>
-      <h2 class="sec-title">看看大家都在起什么名</h2>
-      <p class="sec-sub">每天都有铲屎官从这里带走名字。以下是从名字库里随机抽的几位「人气选手」。</p>
-      <div class="inspo-grid reveal" id="inspo-grid"></div>
-      <div class="inspo-foot">
-        <a class="btn btn-dark" href="#generator" data-scroll="generator">去给毛孩子挑一个</a>
+      <div class="sec-head v-anim">
+        <div>
+          <span class="eyebrow">FAQ · 常见问题</span>
+          <h2 class="sec-title">关于起名，你可能想问</h2>
+        </div>
+        <img class="side-art tilt-left" src="https://aka.doubaocdn.com/s/aFtG3FXfKN" alt="小猫头顶问号、小狗举爪提问的暖萌卡通插画" width="1024" height="1024">
       </div>
-    </div>
-  </section>
-
-  <!-- ============ 起名四步 ============ -->
-  <section class="section steps" id="steps">
-    <div class="wrap">
-      <span class="eyebrow">How It Works · 起名四步</span>
-      <h2 class="sec-title">给毛孩子起名，只需四步</h2>
-      <p class="sec-sub">不玄学，不纠结。跟着走，十分钟定案。</p>
-      <div class="steps-grid reveal">
-        <div class="step">
-          <img src="https://aka.doubaocdn.com/s/rbG2CfdlX3" alt="蹲在地上捧着小猫观察的黑白线条插画" width="1024" height="1024">
-          <div class="step-num">STEP 01</div>
-          <h3>观察你的宠物</h3>
-          <p>性格、花色、怪癖、饭量……好名字都藏在这些细节里。</p>
-        </div>
-        <div class="step">
-          <img src="https://aka.doubaocdn.com/s/iuh9OlzV5U" alt="站在公告板前思考选择风格的黑白线条插画" width="1024" height="1024">
-          <div class="step-num">STEP 02</div>
-          <h3>选定风格</h3>
-          <p>可爱、文艺还是霸气？先把人设定下来，后面全靠它。</p>
-        </div>
-        <div class="step">
-          <img src="https://aka.doubaocdn.com/s/4ILAr1W7gr" alt="举着手机开心查看名字的黑白线条插画" width="1024" height="1024">
-          <div class="step-num">STEP 03</div>
-          <h3>一键生成</h3>
-          <p>选好类型和风格，点一下，候选名字直接送到手上。</p>
-        </div>
-        <div class="step">
-          <img src="https://aka.doubaocdn.com/s/VBvdxGVOnz" alt="戴着名牌项圈的小狗小猫并排坐着的黑白线条插画" width="1024" height="1024">
-          <div class="step-num">STEP 04</div>
-          <h3>喊三遍确认</h3>
-          <p>在门口大声喊三遍不尴尬，这个名字就稳了。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 避坑指南 ============ -->
-  <section class="section tips" id="tips">
-    <div class="wrap">
-      <span class="eyebrow">Tips · 起名避坑指南</span>
-      <h2 class="sec-title">起名四连问，帮你少踩坑</h2>
-      <p class="sec-sub">编辑起名五百次后总结的几条血泪经验，字字珠玑。</p>
-      <div class="tips-grid reveal">
-        <div class="tip-card">
-          <div class="tip-num">TIP 01</div>
-          <h3>谐音梗先查字典</h3>
-          <p>「好养」「旺财」听着顺口，但先默念三遍，确认不会变成尴尬的谐音。</p>
-        </div>
-        <div class="tip-card">
-          <div class="tip-num">TIP 02</div>
-          <h3>别起喊不出口的名</h3>
-          <p>在小区门口大喊测试一下。喊不出口的名字，早晚会变成「那个」。</p>
-        </div>
-        <div class="tip-card">
-          <div class="tip-num">TIP 03</div>
-          <h3>慎用生僻字</h3>
-          <p>宠物医院挂号、疫苗本登记，总得让人念得出来、打得出来。</p>
-        </div>
-        <div class="tip-card">
-          <div class="tip-num">TIP 04</div>
-          <h3>两字名更好喊</h3>
-          <p>两个字顺口，三个字有范儿。先定好音节，再选字，喊起来更响亮。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ CTA 横幅 ============ -->
-  <section class="cta-band" id="cta">
-    <div class="wrap">
-      <h2>一个名字 + 一个毛孩子<br>= <mark>一辈子的故事</mark></h2>
-      <p>现在就去给毛孩子挑一个会喊八百遍的好名字，趁它还没习惯被叫「那个」。</p>
-      <a class="btn btn-dark" href="#generator" data-scroll="generator">开始起名</a>
-    </div>
-  </section>
-
-  <!-- ============ 常见问题 ============ -->
-  <section class="section faq" id="faq">
-    <div class="wrap">
-      <span class="eyebrow">FAQ · 常见问题</span>
-      <h2 class="sec-title">关于起名，你可能想问</h2>
-      <div class="faq-list reveal">
+      <div class="faq-list v-anim">
         <details class="faq-item">
           <summary>为什么起个好名字这么重要？<span class="plus" aria-hidden="true"></span></summary>
           <div class="faq-ans">名字是毛孩子一生里被喊得最多的词。一个好名字，喊起来顺口、听起来顺耳，全家也更容易统一口径——毕竟全家人得叫同一个名字，别到时候一人一个叫法。</div>
@@ -617,9 +929,26 @@
           <summary>生成出来不太满意怎么办？<span class="plus" aria-hidden="true"></span></summary>
           <div class="faq-ans">直接点「重新生成」，或者只换掉某一格：卡片右上角的「换一个」会单独重抽那一格，不动其他名字。不满意就换，名字库管够。</div>
         </details>
+        <details class="faq-item">
+          <summary>AI 定制和普通生成有什么区别？<span class="plus" aria-hidden="true"></span></summary>
+          <div class="faq-ans">普通生成按类型、性别、风格随机抽；AI 定制会结合你选的性格关键词、希望寓意和字数偏好，从名字释义里找契合点，并给每个名字附上「为什么适合」的分析。它俩是互补的，可以都试试。</div>
+        </details>
       </div>
+
+      <!-- FAQ 底部斜贴联系卡 -->
+      <a class="contact-note" href="mailto:3525043496@qq.com" title="发邮件给我们">
+        <span class="cn-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 7 9 6 9-6"/></svg>
+        </span>
+        <span class="cn-text">
+          <strong>还有其他问题？</strong>
+          <span class="cn-mail">3525043496@qq.com</span>
+        </span>
+        <span class="cn-go" aria-hidden="true">→</span>
+      </a>
     </div>
   </section>
+
 </main>
 
 <!-- ============ 页脚 ============ -->
@@ -627,7 +956,7 @@
   <div class="wrap">
     <div class="footer-top">
       <div>
-        <a class="logo" href="#top" data-scroll="hero">
+        <a class="logo" href="#home" data-view="home">
           <span class="paw" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg>
           </span>
@@ -637,16 +966,17 @@
       </div>
       <div class="f-col">
         <h4>栏目</h4>
-        <a href="#generator" data-scroll="generator">起名神器</a>
-        <a href="#inspo" data-scroll="inspo">名字灵感</a>
-        <a href="#steps" data-scroll="steps">起名四步</a>
-        <a href="#faq" data-scroll="faq">常见问题</a>
+        <a href="#generator" data-view="generator">起名神器</a>
+        <a href="#ai" data-view="ai">AI 定制</a>
+        <a href="#inspo" data-view="inspo">名字灵感</a>
+        <a href="#guide" data-view="guide">起名指南</a>
+        <a href="#faq" data-view="faq">常见问题</a>
       </div>
       <div class="f-col">
         <h4>小贴士</h4>
-        <a href="#tips" data-scroll="tips">名字要顺口</a>
-        <a href="#tips" data-scroll="tips">避免谐音梗翻车</a>
-        <a href="#tips" data-scroll="tips">先喊三遍再定案</a>
+        <a href="#guide" data-view="guide">名字要顺口</a>
+        <a href="#guide" data-view="guide">避免谐音梗翻车</a>
+        <a href="#guide" data-view="guide">先喊三遍再定案</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -668,6 +998,7 @@
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
 </button>
 
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly" crossorigin="anonymous"></script>
 <script>
 (function(){
   "use strict";
@@ -916,6 +1247,15 @@
   var state = { pet:"any", gender:"any", styles:[], count:6 };
   var currentNames = [];
 
+  var ICON_COPY = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  var ICON_SWAP = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>';
+  var ICON_CHECK = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg>';
+  var ICON_HEART = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5C6.5 16.7 3 13.4 3 9.9 3 7.2 5.2 5 7.9 5c1.6 0 3.1.8 4.1 2.1C13 5.8 14.5 5 16.1 5 18.8 5 21 7.2 21 9.9c0 3.5-3.5 6.8-9 10.6z"/></svg>';
+  var ICON_PAW = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg>';
+
+  var HOT = { "团子":1,"布丁":1,"旺财":1,"咪咪":1,"奶茶":1,"将军":1,"Luna":1,"二狗":1,"汤圆":1,"糯米":1,"豆包":1,"火锅":1,"麻薯":1,"Mochi":1,"望舒":1,"土豆":1,"拿铁":1,"Coco":1,"泡面":1,"云深":1 };
+
+
   /* ============ 工具 ============ */
   function shuffle(arr){
     var a = arr.slice();
@@ -945,20 +1285,14 @@
     return specific.length ? specific[0] : "any";
   }
 
-  /* ============ 渲染 ============ */
-  var ICON_COPY = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-  var ICON_SWAP = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>';
-  var ICON_CHECK = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg>';
-  var ICON_HEART = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5C6.5 16.7 3 13.4 3 9.9 3 7.2 5.2 5 7.9 5c1.6 0 3.1.8 4.1 2.1C13 5.8 14.5 5 16.1 5 18.8 5 21 7.2 21 9.9c0 3.5-3.5 6.8-9 10.6z"/></svg>';
-  var ICON_PAW = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg>';
-
+  /* ============ 渲染：起名神器 ============ */
   function cardHTML(item, i){
     var tags = item.s.slice(0, 3).map(function(k){ return '<span class="tag ' + k + '">' + STYLE_LABEL[k] + '</span>'; }).join("");
     tags += '<span class="tag pet">' + PET_LABEL[petShownOf(item)] + '</span>';
     if(HOT[item.n]) tags += '<span class="tag hot">热门</span>';
     var faved = FAVS.indexOf(item.n) > -1;
     return '' +
-      '<article class="rcard" style="animation-delay:' + (i * 55) + 'ms">' +
+      '<article class="rcard">' +
         '<div class="rcard-top">' +
           '<h4 class="rname">' + item.n + '</h4>' +
           '<div class="ract">' +
@@ -968,7 +1302,7 @@
           '</div>' +
         '</div>' +
         '<div class="rcard-tags">' + tags + '</div>' +
-        '<p class="rmean">' + item.m + '</p>' +
+        '<p class="rmean">' + (item.m ? item.m : '<span class="rmean-empty">名字好记又好喊，寓意随缘就好～</span>') + '</p>' +
       '</article>';
   }
 
@@ -981,6 +1315,7 @@
     var res = getPool();
     var picked = shuffle(res.pool).slice(0, state.count);
     renderCards(picked);
+    if(window.gsap && !reduceMotion) gsap.fromTo(".rcard", { autoAlpha: 0, y: 20, scale: .95 }, { autoAlpha: 1, y: 0, scale: 1, stagger: .06, duration: .5, ease: "back.out(1.5)", overwrite: true });
     $("#relax-note").style.display = res.relaxed ? "block" : "none";
     addBlessed(picked.length);
     updateMatchCount();
@@ -994,7 +1329,7 @@
     $("#blessed2").textContent = txt;
   }
 
-  /* ============ 交互：筛选 pills ============ */
+  /* ============ 交互：起名神器筛选 ============ */
   document.querySelectorAll(".pill[data-group]").forEach(function(btn){
     btn.addEventListener("click", function(){
       var group = btn.getAttribute("data-group");
@@ -1030,8 +1365,7 @@
       toggleFav(btn.getAttribute("data-name"), btn);
     }
     if(action === "copy"){
-      var name = btn.getAttribute("data-name");
-      copyText(name, btn);
+      copyText(btn.getAttribute("data-name"), btn);
     }
     if(action === "swap"){
       var res = getPool();
@@ -1040,6 +1374,8 @@
         var fresh = pool[Math.floor(Math.random() * pool.length)];
         currentNames[idx] = fresh;
         card.outerHTML = cardHTML(fresh, idx);
+        var newCard = card.parentNode.children[idx];
+        if(window.gsap && !reduceMotion) gsap.fromTo(newCard, { autoAlpha: 0, y: 14, scale: .96 }, { autoAlpha: 1, y: 0, scale: 1, duration: .4, ease: "back.out(1.5)", overwrite: true });
         addBlessed(1);
         if(res.relaxed){ $("#relax-note").style.display = "block"; }
       }
@@ -1076,7 +1412,6 @@
   }
 
   /* ============ 热门 & 收藏 ============ */
-  var HOT = { "团子":1,"布丁":1,"旺财":1,"咪咪":1,"奶茶":1,"将军":1,"Luna":1,"二狗":1,"汤圆":1,"糯米":1,"豆包":1,"火锅":1,"麻薯":1,"Mochi":1,"望舒":1,"土豆":1,"拿铁":1,"Coco":1,"泡面":1,"云深":1 };
   var FAVS = [];
   try { FAVS = JSON.parse(localStorage.getItem("petname-favs") || "[]"); } catch(e){ FAVS = []; }
   function saveFavs(){ try { localStorage.setItem("petname-favs", JSON.stringify(FAVS)); } catch(e){} }
@@ -1101,6 +1436,7 @@
     if(!bar) return;
     if(!FAVS.length){ bar.hidden = true; return; }
     bar.hidden = false;
+    if(window.gsap && !reduceMotion) gsap.fromTo(bar, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: .45, ease: "back.out(1.8)", overwrite: true });
     $("#fav-count").textContent = FAVS.length;
     $("#fav-chips").innerHTML = FAVS.map(function(nm){
       return '<button type="button" class="fav-chip" data-name="' + nm + '">' + nm + '</button>';
@@ -1144,43 +1480,16 @@
     copyText(this.getAttribute("data-name"), this);
   });
 
-  /* ============ 灵感卡片复制 ============ */
-  $("#inspo-grid").addEventListener("click", function(e){
-    var btn = e.target.closest('[data-action="copy-inspo"]');
-    if(btn) copyText(btn.getAttribute("data-name"), btn);
-  });
-
-  /* ============ 返回顶部 & 滚动显现 ============ */
-  var toTop = $("#to-top");
-  window.addEventListener("scroll", function(){
-    toTop.classList.toggle("show", window.pageYOffset > 640);
-  }, { passive:true });
-  toTop.addEventListener("click", function(){
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-  var rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var revealEls = document.querySelectorAll(".reveal");
-  if("IntersectionObserver" in window && !rm){
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
-      });
-    }, { threshold: .12 });
-    revealEls.forEach(function(el){ io.observe(el); });
-  } else {
-    revealEls.forEach(function(el){ el.classList.add("in"); });
-  }
-
-  /* ============ 灵感卡片 ============ */
+  /* ============ 名字灵感 ============ */
   var INSPO = [
-    { n:"团子", m:"软乎乎的糯米团子，一喊就想揉脸。", s:["cute"], bg:"#ffe3ee" },
-    { n:"望舒", m:"《楚辞》里的月神车夫，气质清冷。", s:["ancient"], bg:"#dcf4ff" },
-    { n:"将军", m:"出门遛狗，气场像巡街。", s:["boss"], bg:"#fff3cf" },
-    { n:"泡面", m:"三分钟热气，但永远真香。", s:["funny"], bg:"#ddf5e8" },
-    { n:"Mochi", m:"日语糯米糍，软萌到融化。", s:["trendy"], bg:"#ece8ff" },
-    { n:"二狗", m:"狗中王富贵，大智若愚的经典。", s:["funny"], bg:"#ffe8d9" },
-    { n:"奶茶", m:"续命水本水，甜到心里。", s:["food"], bg:"#ffe3ee" },
-    { n:"云深", m:"云深不知处，气韵悠长。", s:["artsy"], bg:"#dcf4ff" }
+    { n:"团子", m:"软乎乎的糯米团子，一喊就想揉脸。", s:["cute"], bg:"#ffe3e8" },
+    { n:"望舒", m:"《楚辞》里的月神车夫，气质清冷。", s:["ancient"], bg:"#dff0fb" },
+    { n:"将军", m:"出门遛狗，气场像巡街。", s:["boss"], bg:"#fff1d3" },
+    { n:"泡面", m:"三分钟热气，但永远真香。", s:["funny"], bg:"#dff4e7" },
+    { n:"Mochi", m:"日语糯米糍，软萌到融化。", s:["trendy"], bg:"#ede8fd" },
+    { n:"二狗", m:"狗中王富贵，大智若愚的经典。", s:["funny"], bg:"#ffeadd" },
+    { n:"奶茶", m:"续命水本水，甜到心里。", s:["food"], bg:"#ffe3e8" },
+    { n:"云深", m:"云深不知处，气韵悠长。", s:["artsy"], bg:"#dff0fb" }
   ];
   $("#inspo-grid").innerHTML = INSPO.map(function(it){
     var tags = it.s.map(function(k){ return '<span class="tag ' + k + '">' + STYLE_LABEL[k] + '</span>'; }).join("");
@@ -1192,17 +1501,18 @@
       '<p class="imean">' + it.m + '</p>' +
     '</article>';
   }).join("");
+  $("#inspo-grid").addEventListener("click", function(e){
+    var btn = e.target.closest('[data-action="copy-inspo"]');
+    if(btn) copyText(btn.getAttribute("data-name"), btn);
+  });
 
-  /* ============ 平滑滚动 ============ */
-  document.querySelectorAll("[data-scroll]").forEach(function(a){
-    a.addEventListener("click", function(e){
-      var id = a.getAttribute("data-scroll");
-      var el = document.getElementById(id);
-      if(!el) return;
-      e.preventDefault();
-      var y = el.getBoundingClientRect().top + window.pageYOffset - 74;
-      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
-    });
+  /* ============ 返回顶部 ============ */
+  var toTop = $("#to-top");
+  window.addEventListener("scroll", function(){
+    toTop.classList.toggle("show", window.pageYOffset > 640);
+  }, { passive:true });
+  toTop.addEventListener("click", function(){
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
   /* ============ 名词轮播 ============ */
@@ -1221,12 +1531,478 @@
     }, 2400);
   }
 
+  /* ============ 多画面切换 ============ */
+  var VIEWS = ["home","generator","ai","inspo","guide","faq"];
+  var currentView = null;
+  var floatInited = false;
+  var statCounted = false;
+
+  function triggerStatCount(){
+    if(statCounted || reduceMotion) return;
+    statCounted = true;
+    var s8 = $("#stat-8"), s6 = $("#stat-6");
+    $("#stat-names").textContent = "0";
+    if(s8) s8.textContent = "0";
+    if(s6) s6.textContent = "0";
+    countUp($("#stat-names"), NAMES.length, "+");
+    countUp($("#stat-8"), 8, "");
+    countUp($("#stat-6"), 6, "");
+  }
+  function countUp(el, target, suffix){
+    if(!el) return;
+    var obj = { v: 0 };
+    gsap.to(obj, {
+      v: target, duration: 1.3, ease: "power2.out",
+      onUpdate: function(){ el.textContent = Math.round(obj.v) + (suffix || ""); }
+    });
+  }
+
+  /* 首页华丽入场 */
+  function runHomeAnim(){
+    if(!window.gsap || reduceMotion) return;
+    var tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    tl.from(".view-home .hero .eyebrow", { autoAlpha: 0, y: 16, duration: .5 }, 0)
+      .from(".view-home .hero h1", { autoAlpha: 0, y: 30, duration: .7 }, .1)
+      .from(".view-home .hero-sub", { autoAlpha: 0, y: 18, duration: .55 }, .22)
+      .from(".view-home .rotator-line", { autoAlpha: 0, y: 14, duration: .5 }, .28)
+      .from(".view-home .hero-actions", { autoAlpha: 0, y: 14, duration: .5 }, .34)
+      .from(".view-home .hero-note", { autoAlpha: 0, duration: .4 }, .4)
+      .from(".view-home .hero-art img", { autoAlpha: 0, scale: .92, rotation: -3, duration: .65, ease: "back.out(1.6)" }, .1)
+      .from(".view-home .hero-art .deco-star, .view-home .hero-art .deco-dots, .view-home .hero-art .deco-squiggle", { autoAlpha: 0, scale: 0, rotation: -25, stagger: .07, duration: .45, ease: "back.out(2)" }, .3)
+      .from(".view-home .stat-strip", { autoAlpha: 0, y: 20, duration: .5 }, .5)
+      .from(".view-home .daily-card", { autoAlpha: 0, y: 24, duration: .55 }, .58)
+      .from(".view-home .entry-grid", { autoAlpha: 0, y: 26, duration: .6 }, .66)
+      .from(".view-home .cta-band", { autoAlpha: 0, y: 26, duration: .6 }, .76);
+    if(!floatInited){
+      floatInited = true;
+      gsap.to(".view-home .hero-art img", { y: -10, duration: 3.2, delay: 1, ease: "sine.inOut", yoyo: true, repeat: -1 });
+      gsap.to(".view-home .hero-art .deco-star", { rotation: 22, duration: 4.5, delay: 1, ease: "sine.inOut", yoyo: true, repeat: -1 });
+    }
+  }
+
+  /* 普通画面入场 */
+  function viewEnter(id){
+    if(!window.gsap || reduceMotion) return;
+    var v = document.getElementById("view-" + id);
+    if(!v) return;
+    var els = v.querySelectorAll(".v-anim");
+    if(els.length){
+      gsap.fromTo(els, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, stagger: .08, duration: .55, ease: "power3.out", overwrite: true });
+    }
+  }
+
+  function goTo(id, skipHash){
+    if(VIEWS.indexOf(id) === -1) return;
+    var entering = document.getElementById("view-" + id);
+    if(!entering) return;
+    var leaving = document.querySelector(".view.active");
+    if(leaving === entering){
+      currentView = id;
+      return;
+    }
+    if(!skipHash){
+      try { if(location.hash !== "#" + id) location.hash = id; } catch(e){}
+    }
+    currentView = id;
+    document.querySelectorAll(".nav-links a[data-view]").forEach(function(a){
+      a.classList.toggle("active", a.getAttribute("data-view") === id);
+    });
+    window.scrollTo(0, 0);
+    var open = function(){
+      entering.classList.add("active");
+      if(id === "home"){ triggerStatCount(); runHomeAnim(); }
+      else { viewEnter(id); }
+    };
+    if(window.gsap && !reduceMotion && leaving){
+      gsap.to(leaving, { autoAlpha: 0, y: -26, duration: .3, ease: "power2.in", overwrite: true, onComplete: function(){
+        leaving.classList.remove("active");
+        gsap.set(leaving, { clearProps: "all" });
+        open();
+      }});
+    } else {
+      if(leaving) leaving.classList.remove("active");
+      open();
+    }
+  }
+
+  function hashRoute(){
+    var h = (location.hash || "").replace("#", "");
+    goTo(VIEWS.indexOf(h) > -1 ? h : "home", true);
+  }
+
+  document.querySelectorAll("[data-view]").forEach(function(a){
+    a.addEventListener("click", function(e){
+      var id = a.getAttribute("data-view");
+      if(VIEWS.indexOf(id) > -1){
+        e.preventDefault();
+        goTo(id);
+      }
+    });
+  });
+  window.addEventListener("hashchange", hashRoute);
+
+  /* ============ AI 定制 ============ */
+  /* ============ AI 对话式起名 ============ */
+  function esc(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+
+  function apiBase(){
+    if(location.protocol === "http:" || location.protocol === "https:") return location.origin;
+    return "http://localhost:3000";
+  }
+
+  var chatState = { sessionId: null, intent: { pet:"any", gender:"any", traits:[], hopes:[], len:2, avoid:"" }, busy: false };
+
+  function initAiStatus(){
+    var dot = $("#ai-status-dot");
+    var txt = $("#ai-status-text");
+    if(!dot || !txt) return;
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ ctrl.abort(); }, 4000);
+    fetch(apiBase() + "/api/health", { signal: ctrl.signal })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d.ready){
+          dot.classList.add("live");
+          txt.innerHTML = "AI Agent 已连接 · 模型 <strong>" + esc(d.model || "") + "</strong>";
+        } else if(d.provider === "mock"){
+          dot.classList.add("mock");
+          txt.innerHTML = "AI Agent 已连接 · 当前为<strong>本地引擎</strong>（未配置模型 Key，配置 .env 即接入真实大模型）";
+        } else {
+          dot.classList.add("mock");
+          txt.innerHTML = "AI Agent 已连接 · 模型未配置 Key（<strong>" + esc(d.model || "") + "</strong>，请在 .env 填写 AI_API_KEY）";
+        }
+      })
+      .catch(function(){
+        dot.classList.add("off");
+        txt.innerHTML = "后端未启动（npm start）· 当前使用浏览器本地引擎";
+      })
+      .finally(function(){ clearTimeout(timer); });
+  }
+  var CHAT_PET = {
+    cat:["猫","喵","咪","橘","布偶","英短","暹罗","缅因","奶牛","狸花","加菲","折耳"],
+    dog:["狗","汪","犬","柯基","柴犬","金毛","泰迪","拉布拉多","边牧","萨摩","哈士奇","二哈","比熊","博美","法斗","雪纳瑞"],
+    rabbit:["兔","垂耳","侏儒兔"],
+    hamster:["仓鼠","鼠","金丝熊","豚鼠","奶茶鼠"],
+    bird:["鸟","鹦鹉","玄凤","牡丹","虎皮","文鸟","鸽子","八哥"]
+  };
+  var CHAT_TRAIT = {
+    "粘人":["粘","黏","缠","跟屁虫"], "高冷":["高冷","傲娇","酷"], "活泼":["活泼","闹","好动","皮","淘气","顽皮","疯"],
+    "贪吃":["馋","吃货","能吃","爱吃","贪吃","贪嘴"], "爱睡觉":["睡","懒","躺","安静","困"], "拆家":["拆家","捣蛋","破坏","咬"],
+    "胆小":["胆小","怕生","害羞","怂","温顺"], "聪明":["聪明","机灵","灵","懂事","精"]
+  };
+  var CHAT_HOPE = {
+    "好运":["好运","福","幸运","吉"], "健康":["健康","平安","长寿","安康"], "富贵":["富贵","发财","招财","旺财","有钱","暴富"],
+    "文艺":["文艺","诗意","书卷","雅","仙","清冷"], "可爱":["可爱","萌","甜","软萌","奶"],
+    "霸气":["霸气","王","大佬","酷炫","威风","凶","帅"], "洋气":["洋气","英文","潮流","时尚","国际","摩登"],
+    "古风":["古风","古韵","诗词","汉服","国风","文雅"]
+  };
+  var CHAT_LEN = { 2:["两","2","二"], 3:["三","3"], 4:["四","4"] };
+  var CHAT_WELCOME = "嗨～想给你家宝贝起个名字对吧？跟我聊聊它就行，比如：\n「我家橘猫特别粘人，想要可爱点的」\n或者告诉我你喜欢的风格、几个字，我会记着接着聊～";
+
+  function chatIntentOf(text, prev){
+    var it = {
+      pet: (prev && prev.pet) || "any",
+      gender: (prev && prev.gender) || "any",
+      traits: ((prev && prev.traits) || []).slice(),
+      hopes: ((prev && prev.hopes) || []).slice(),
+      len: (prev && prev.len) || 2,
+      avoid: (prev && prev.avoid) || ""
+    };
+    for(var pet in CHAT_PET){
+      if(CHAT_PET[pet].some(function(k){ return text.indexOf(k) > -1; })) it.pet = pet;
+    }
+    if(/公|男|弟弟|哥哥|小伙|男孩|汉子/.test(text)) it.gender = "m";
+    if(/母|女|妹妹|姐姐|姑娘|女孩|小公主/.test(text)) it.gender = "f";
+    for(var t in CHAT_TRAIT){
+      if(CHAT_TRAIT[t].some(function(k){ return text.indexOf(k) > -1; }) && it.traits.indexOf(t) === -1) it.traits.push(t);
+    }
+    for(var h in CHAT_HOPE){
+      if(CHAT_HOPE[h].some(function(k){ return text.indexOf(k) > -1; }) && it.hopes.indexOf(h) === -1) it.hopes.push(h);
+    }
+    for(var l in CHAT_LEN){
+      if(CHAT_LEN[l].some(function(k){ return text.indexOf(k) > -1; })) it.len = parseInt(l, 10);
+    }
+    var am = text.match(/(?:不要|别叫|避开|避免|不喜欢|忌|别用)[^，。！？!?、\s]{1,3}/);
+    if(am){ it.avoid = am[0].replace(/(?:不要|别叫|避开|避免|不喜欢|忌|别用)/, "").slice(0, 2); }
+    it.traits = it.traits.slice(0, 4);
+    it.hopes = it.hopes.slice(0, 4);
+    return it;
+  }
+
+  function chatAnalyze(it){
+    var pool = NAMES.filter(function(x){
+      if(x.p.indexOf(it.pet) === -1 && x.p.indexOf("any") === -1) return false;
+      if(it.gender !== "any" && x.g !== "any" && x.g !== it.gender) return false;
+      if(x.n.length !== it.len) return false;
+      if(it.avoid && x.n.indexOf(it.avoid) > -1) return false;
+      return true;
+    });
+    var scored = pool.map(function(x){
+      var styles = [];
+      it.traits.forEach(function(t){ (TRAIT_STYLE[t] || []).forEach(function(st){ styles.push(st); }); });
+      it.hopes.forEach(function(h){ (HOPE_STYLE[h] || []).forEach(function(st){ styles.push(st); }); });
+      var hits = styles.filter(function(st){ return x.s.indexOf(st) > -1; });
+      var score = hits.length * 2;
+      var kws = [];
+      it.hopes.forEach(function(h){
+        (HOPE_KW[h] || []).forEach(function(k){ if(x.m.indexOf(k) > -1 && kws.indexOf(h) === -1){ kws.push(h); } });
+      });
+      score += kws.length * 1.5;
+      return { it: x, score: score, styles: hits, kws: kws };
+    });
+    var cand = scored.filter(function(s){ return s.score > 0; });
+    if(!cand.length) cand = scored;
+    cand.sort(function(a, b){ return b.score - a.score; });
+    var top = cand.slice(0, Math.min(24, cand.length));
+    return shuffle(top).slice(0, 3);
+  }
+
+  function chatReason(it, s){
+    var parts = [];
+    if(it.traits.length && s.styles.length){
+      parts.push("性格「" + it.traits.join("、") + "」很配「" + s.styles.map(function(st){ return STYLE_LABEL[st]; }).join("、") + "」风格");
+    }
+    if(s.kws.length) parts.push("寓意「" + s.kws.join("、") + "」就藏在名字释义里");
+    if(!parts.length) parts.push("没给太多线索，纯靠眼缘挑的——名字本身是好的");
+    parts.push("释义：" + s.it.m);
+    return parts.join(" · ");
+  }
+
+  function chatLocalReply(msg){
+    var it = chatIntentOf(msg, chatState.intent);
+    chatState.intent = it;
+    var wantName = /起名|名字|叫什么|取个|起个|给它|叫它|推荐|想一个/.test(msg);
+    var petOnly = it.pet !== "any" && !it.traits.length && !it.hopes.length && it.len === 2 && !it.avoid;
+    if(petOnly && !wantName){
+      return { reply: "「" + PET_LABEL[it.pet] + "」呀，喜欢！再告诉我一点它的性格，或者你想要的感觉？\n比如「特别粘人」「想要文艺一点的」，我就能开动啦～", names: [], engine: "浏览器本地引擎" };
+    }
+    var got = [];
+    if(it.pet !== "any") got.push(PET_LABEL[it.pet]);
+    if(it.gender !== "any") got.push(it.gender === "m" ? "弟弟" : "妹妹");
+    if(it.traits.length) got.push("性格「" + it.traits.join("、") + "」");
+    if(it.hopes.length) got.push("想要「" + it.hopes.join("、") + "」的感觉");
+    if(it.len !== 2) got.push(it.len + " 个字");
+    var picked = chatAnalyze(it);
+    var names = picked.map(function(s){
+      return {
+        name: s.it.n,
+        meaning: s.it.m,
+        reason: chatReason(it, s),
+        tags: s.it.s.slice(0, 3),
+        pet: it.pet !== "any" ? it.pet : (s.it.p.filter(function(k){ return k !== "any"; })[0] || "any")
+      };
+    });
+    var head = got.length ? ("收到～" + got.join("，") + "。") : "好嘞～";
+    var hint = it.hopes[0] || (it.traits.length ? "贴" : "可爱");
+    return {
+      reply: head + "\n我挑了几个，看看合不合眼缘：\n想再" + hint + "一点、换个字数，或者说说别的想法？直接告诉我，我马上换～",
+      names: names,
+      engine: "浏览器本地引擎"
+    };
+  }
+
+  function chatCardHtml(it, engine){
+    var tags = (it.tags || []).slice(0, 3).map(function(k){
+      return '<span class="tag ' + (STYLE_LABEL[k] ? k : "") + '">' + esc(STYLE_LABEL[k] || k) + '</span>';
+    }).join("");
+    tags += '<span class="tag pet">' + esc(PET_LABEL[it.pet] || "通用") + '</span>';
+    var faved = FAVS.indexOf(it.name) > -1;
+    return '<article class="rcard">' +
+      '<div class="rcard-top">' +
+        '<h4 class="rname">' + esc(it.name) + '</h4>' +
+        '<div class="ract">' +
+          '<button type="button" class="mini-btn' + (faved ? " faved" : "") + '" data-action="fav" data-name="' + esc(it.name) + '" aria-label="' + (faved ? "取消收藏" : "收藏") + '" title="' + (faved ? "取消收藏" : "收藏") + '">' + ICON_HEART + '</button>' +
+          '<button type="button" class="mini-btn" data-action="copy" data-name="' + esc(it.name) + '" aria-label="复制名字 ' + esc(it.name) + '" title="复制名字">' + ICON_COPY + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="rcard-tags">' + tags + '</div>' +
+      '<p class="rmean">' + (it.meaning ? esc(it.meaning) : '<span class="rmean-empty">名字好记又好喊，寓意随缘就好～</span>') + '</p>' +
+      '<p class="ai-why"><b>AI 推荐</b> · ' + esc(it.reason || "") + '</p>' +
+      (engine ? '<p class="ai-src">由 ' + esc(engine) + ' 生成</p>' : "") +
+    '</article>';
+  }
+
+  function chatScroll(){
+    var box = $("#chat-box");
+    if(box) box.scrollTop = box.scrollHeight;
+  }
+
+  function chatType(el, text, done){
+    el.textContent = "";
+    var rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(rm){ el.textContent = text; if(done) done(); return; }
+    var i = 0;
+    var timer = setInterval(function(){
+      i += 1;
+      el.textContent = text.slice(0, i);
+      chatScroll();
+      if(i >= text.length){ clearInterval(timer); if(done) done(); }
+    }, 20);
+  }
+
+  function chatAppend(role, data){
+    var box = $("#chat-box");
+    var div = document.createElement("div");
+    div.className = "msg " + role;
+    var note = data.note || (data.local ? "后端没启动，先用浏览器本地引擎陪你聊～（npm start 即可接上完整后端）" : "");
+    var namesHtml = "";
+    if(role === "ai" && data.names && data.names.length){
+      namesHtml = '<div class="msg-names">' + data.names.map(function(it){ return chatCardHtml(it, data.engine); }).join("") + '</div>';
+    }
+    var noteHtml = note ? '<div class="chat-note">' + esc(note) + '</div>' : "";
+    div.innerHTML = '<span class="msg-av">' + (role === "user" ? "我" : "AI") + '</span>' +
+      '<div class="msg-main"><div class="msg-bub"><span class="msg-text"></span></div>' + noteHtml + namesHtml + '</div>';
+    box.appendChild(div);
+    if(role === "user"){
+      div.querySelector(".msg-text").textContent = data.text;
+    } else {
+      chatType(div.querySelector(".msg-text"), data.text, function(){
+        if(namesHtml && window.gsap && !(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)){
+          gsap.fromTo(div.querySelectorAll(".msg-names .rcard"), { autoAlpha: 0, y: 16, scale: .95 }, { autoAlpha: 1, y: 0, scale: 1, stagger: .09, duration: .45, ease: "back.out(1.6)", overwrite: true });
+        }
+      });
+    }
+    chatScroll();
+    return div;
+  }
+
+  function chatTyping(){
+    var box = $("#chat-box");
+    var div = document.createElement("div");
+    div.className = "msg ai";
+    div.id = "chat-typing-msg";
+    div.innerHTML = '<span class="msg-av">AI</span><div class="msg-main"><div class="msg-bub"><span class="chat-typing"><i></i><i></i><i></i></span></div></div>';
+    box.appendChild(div);
+    chatScroll();
+  }
+  function chatRemoveTyping(){
+    var el = document.getElementById("chat-typing-msg");
+    if(el) el.remove();
+  }
+
+  function callChatServer(msg){
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ ctrl.abort(); }, 18000);
+    return fetch(apiBase() + "/api/ai-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: chatState.sessionId, message: msg }),
+      signal: ctrl.signal
+    }).then(function(resp){
+      if(!resp.ok) throw new Error("HTTP " + resp.status);
+      return resp.json();
+    }).then(function(data){
+      if(!data || !data.ok) throw new Error((data && data.error) || "对话失败");
+      return data;
+    }).finally(function(){ clearTimeout(timer); });
+  }
+
+  function sendChat(prefill){
+    if(chatState.busy) return;
+    var msg = ((prefill || "") + "").trim();
+    if(!msg) msg = ($("#chat-input").value || "").trim();
+    if(!msg) return;
+    $("#chat-input").value = "";
+    chatState.busy = true;
+    $("#chat-quick").style.display = "none";
+    chatAppend("user", { text: msg });
+    chatTyping();
+    callChatServer(msg).then(function(data){
+      chatState.sessionId = data.sessionId || chatState.sessionId;
+      chatRemoveTyping();
+      chatAppend("ai", { text: data.reply || "……", names: data.names || [], engine: data.engine, note: data.note, local: data.mode === "fallback" });
+      chatState.busy = false;
+    }).catch(function(){
+      chatRemoveTyping();
+      var r = chatLocalReply(msg);
+      chatAppend("ai", { text: r.reply, names: r.names || [], engine: r.engine, local: true });
+      chatState.busy = false;
+    });
+  }
+
+  function chatReset(){
+    chatState.sessionId = null;
+    chatState.intent = { pet:"any", gender:"any", traits:[], hopes:[], len:2, avoid:"" };
+    $("#chat-box").innerHTML = "";
+    $("#chat-quick").style.display = "flex";
+    chatAppend("ai", { text: CHAT_WELCOME, names: [] });
+    var inp = $("#chat-input");
+    if(inp) inp.focus();
+  }
+
+  $("#chat-form").addEventListener("submit", function(e){ e.preventDefault(); sendChat(); });
+  $("#chat-new").addEventListener("click", chatReset);
+  $("#chat-quick").addEventListener("click", function(e){
+    var b = e.target.closest(".chip");
+    if(b) sendChat(b.getAttribute("data-say"));
+  });
+  $("#chat-box").addEventListener("click", function(e){
+    var btn = e.target.closest("[data-action]");
+    if(!btn) return;
+    var action = btn.getAttribute("data-action");
+    if(action === "fav") toggleFav(btn.getAttribute("data-name"), btn);
+    if(action === "copy") copyText(btn.getAttribute("data-name"), btn);
+  });
+  chatReset();
+
+
+
+  /* ============ GSAP 常规 ============ */
+  if(window.gsap){
+    gsap.defaults({ duration: .7, ease: "power3.out" });
+    var mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: reduce)", function(){
+      gsap.set(".view.active .v-anim", { autoAlpha: 1, y: 0 });
+    });
+    mm.add("(prefers-reduced-motion: no-preference)", function(){
+      $("#btn-gen").addEventListener("click", function(){
+        gsap.fromTo(this, { scale: .94 }, { scale: 1, duration: .35, ease: "back.out(2.2)", overwrite: true });
+      });
+      $("#chat-send").addEventListener("click", function(){
+        gsap.fromTo(this, { scale: .94 }, { scale: 1, duration: .35, ease: "back.out(2.2)", overwrite: true });
+      });
+    });
+  }
+
   /* ============ 初始化 ============ */
-  $("#stat-names").textContent = NAMES.length + "+";
-  dailyPick();
-  updateMatchCount();
-  renderFavBar();
-  gen();
+  function boot(){
+    $("#stat-names").textContent = NAMES.length + "+";
+    dailyPick();
+    updateMatchCount();
+    renderFavBar();
+    gen();
+    hashRoute();
+    initAiStatus();
+    if(!reduceMotion){
+      triggerStatCount();
+      runHomeAnim();
+    }
+  }
+
+  // 名字库以服务端数据库为准（后台管理增删改立即生效）；失败则用页面内嵌库兜底
+  function fetchNames(){
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ ctrl.abort(); }, 3500);
+    return fetch(apiBase() + "/api/names", { signal: ctrl.signal })
+      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function(d){
+        if(!d || !d.ok || !Array.isArray(d.names) || !d.names.length) throw new Error("数据异常");
+        return d.names;
+      })
+      .finally(function(){ clearTimeout(timer); });
+  }
+
+  fetchNames().then(function(list){
+    NAMES.length = 0;
+    Array.prototype.push.apply(NAMES, list);
+    boot();
+  }).catch(function(){
+    boot();
+  });
 })();
 </script>
 </body>

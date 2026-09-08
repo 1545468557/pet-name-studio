@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>名字库后台 · 宠物起名事务所</title>
+<style>
+  :root{
+    --cream:#FFF8F1; --peach:#FFF0E2; --accent:#FF8A5C; --accent-deep:#C25E2E;
+    --ink:#2E2620; --ink-soft:#6E6259; --gray:#A2958A; --pink-bg:#FFEEF1;
+    --card:#FFFFFF; --line:rgba(46,38,32,.12); --shadow:0 2px 0 var(--line);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.6}
+  .top{background:var(--ink);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .top h1{font-size:17px;margin:0;font-weight:700}
+  .top .sub{font-size:12px;color:#CBBFB4}
+  .top .spacer{flex:1}
+  .btn{border:2px solid var(--ink);border-radius:10px;padding:6px 14px;font-size:13px;cursor:pointer;font-family:inherit;background:#fff;color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+  .btn:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+  .btn:active{transform:translate(1px,1px);box-shadow:0 0 0 var(--ink)}
+  .btn-dark{background:var(--accent);color:var(--ink)}
+  .btn-danger{background:#FFE3E3;color:#B3261E}
+  .btn-sm{padding:3px 10px;font-size:12px;border-radius:8px;box-shadow:1.5px 1.5px 0 var(--ink)}
+  .wrap{max-width:1080px;margin:0 auto;padding:22px 18px 60px}
+  .cards{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .stat{flex:1 1 140px;min-width:0;background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:12px 14px;box-shadow:3px 3px 0 var(--ink)}
+  .stat .k{font-size:12px;color:var(--ink-soft)}
+  .stat .v{font-size:22px;font-weight:800;margin-top:2px}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  .toolbar input[type=text]{border:2px solid var(--ink);border-radius:10px;padding:7px 12px;font-size:13px;font-family:inherit;background:#fff;width:240px;max-width:100%}
+  .pager{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--ink-soft)}
+  table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);border:2px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:3px 3px 0 var(--ink)}
+  th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--peach);font-size:12px;color:var(--ink-soft);white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  .mean{max-width:260px;font-size:12.5px;color:var(--ink-soft)}
+  .tag{display:inline-block;background:var(--peach);border:1.5px solid var(--ink);border-radius:999px;padding:0 8px;font-size:11px;margin:1px 2px 1px 0}
+  .tag.hot{background:var(--accent)}
+  .ops{white-space:nowrap}
+  .empty{padding:26px;text-align:center;color:var(--gray)}
+  /* 弹窗 */
+  .mask{position:fixed;inset:0;background:rgba(46,38,32,.45);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:50;overflow:auto}
+  .mask.open{display:flex}
+  .modal{background:var(--cream);border:3px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);width:100%;max-width:560px;padding:22px}
+  .modal h2{margin:0 0 16px;font-size:17px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+  .field input[type=text]{width:100%;border:2px solid var(--ink);border-radius:10px;padding:8px 12px;font-size:14px;font-family:inherit;background:#fff}
+  .field textarea{width:100%;border:2px solid var(--ink);border-radius:10px;padding:8px 12px;font-size:14px;font-family:inherit;background:#fff;min-height:64px;resize:vertical}
+  .pills{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{border:2px solid var(--ink);border-radius:999px;padding:4px 14px;font-size:13px;cursor:pointer;background:#fff;font-family:inherit}
+  .pill.on{background:var(--accent);font-weight:700}
+  .modal-ops{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:999px;padding:9px 20px;font-size:13px;display:none;z-index:99;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  .toast.show{display:block}
+  .tokenbar{background:#FFF4E5;border:2px dashed var(--accent);border-radius:12px;padding:10px 14px;margin-bottom:16px;display:none;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px}
+  .tokenbar input{border:2px solid var(--ink);border-radius:8px;padding:6px 10px;font-family:inherit;font-size:13px;width:220px}
+  .note{font-size:12px;color:var(--ink-soft);margin-top:10px}
+  @media (max-width:600px){
+    table{font-size:12.5px}
+    .mean{max-width:160px}
+    .toolbar input[type=text]{width:100%}
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>名字库后台管理</h1>
+  <span class="sub">宠物起名事务所 · 增删改立即同步到前台与 AI Agent</span>
+  <div class="spacer"></div>
+  <button class="btn btn-dark btn-sm" id="btn-add">＋ 新增名字</button>
+  <button class="btn btn-sm" id="btn-reload">↻ 刷新</button>
+</div>
+
+<div class="wrap">
+
+  <div class="tokenbar" id="tokenbar">
+    <span>管理令牌：</span>
+    <input type="password" id="token-input" placeholder="ADMIN_TOKEN" autocomplete="off">
+    <button class="btn btn-sm" id="token-save">保存</button>
+    <span class="note">令牌保存在本机浏览器，用于访问管理接口。</span>
+  </div>
+
+  <div class="cards" id="stat-cards"></div>
+
+  <div class="toolbar">
+    <input type="text" id="search" placeholder="搜索名字或释义关键词…" autocomplete="off">
+    <button class="btn" id="btn-search">搜索</button>
+    <div class="pager">
+      <button class="btn btn-sm" id="prev">‹ 上一页</button>
+      <span id="page-info">第 1 / 1 页</span>
+      <button class="btn btn-sm" id="next">下一页 ›</button>
+      <span id="total-info"></span>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>名字</th><th>释义</th><th>性别</th><th>风格</th><th>适用宠物</th><th>热门</th><th>操作</th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div class="empty" id="empty" style="display:none">没有找到名字，换个关键词试试～</div>
+
+</div>
+
+<!-- 新增 / 编辑弹窗 -->
+<div class="mask" id="mask">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <h2 id="modal-title">新增名字</h2>
+    <input type="hidden" id="f-id">
+    <div class="field">
+      <label for="f-n">名字 <span style="color:var(--accent-deep)">*</span></label>
+      <input type="text" id="f-n" maxlength="6" placeholder="例如：团子">
+    </div>
+    <div class="field">
+      <label for="f-m">一句话释义 <span style="color:var(--accent-deep)">*</span></label>
+      <textarea id="f-m" maxlength="100" placeholder="例如：圆滚滚的一团，只想揉脸。"></textarea>
+    </div>
+    <div class="field">
+      <label>性别倾向</label>
+      <div class="pills" id="f-g"></div>
+    </div>
+    <div class="field">
+      <label>风格标签（最多 3 个）</label>
+      <div class="pills" id="f-s"></div>
+    </div>
+    <div class="field">
+      <label>适用宠物（最多 3 个）</label>
+      <div class="pills" id="f-p"></div>
+    </div>
+    <div class="field">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="f-hot" style="width:16px;height:16px"> 热门标记（前台显示「热门」标签）
+      </label>
+    </div>
+    <div class="modal-ops">
+      <button class="btn" id="modal-cancel">取消</button>
+      <button class="btn btn-dark" id="modal-save">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+  var API = "/api/admin";
+  var STYLE_LABEL = { cute:"可爱", artsy:"文艺", boss:"霸气", funny:"搞笑", food:"吃货", ancient:"古风", trendy:"洋气", soft:"软萌" };
+  var PET_LABEL = { cat:"猫", dog:"狗", rabbit:"兔子", hamster:"仓鼠", bird:"鸟", any:"通用" };
+  var GENDER_LABEL = { m:"男孩", f:"女孩", any:"通用" };
+  var state = { q:"", page:1, limit:20, total:0, editing:null };
+
+  function esc(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+
+  function toast(msg){
+    var t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._tm);
+    t._tm = setTimeout(function(){ t.classList.remove("show"); }, 2000);
+  }
+
+  /* ---- 令牌 ---- */
+  function getToken(){ return localStorage.getItem("petname-admin-token") || ""; }
+  function saveToken(t){ localStorage.setItem("petname-admin-token", t); }
+
+  function authHeaders(){
+    var h = { "Content-Type": "application/json" };
+    var t = getToken();
+    if(t) h["X-Admin-Token"] = t;
+    return h;
+  }
+
+  function api(path, opts){
+    opts = opts || {};
+    opts.headers = Object.assign(authHeaders(), opts.headers || {});
+    return fetch(API + path, opts).then(function(r){
+      if(r.status === 401){
+        $("#tokenbar").style.display = "flex";
+        throw new Error("需要管理令牌");
+      }
+      return r.json().then(function(d){
+        if(!d.ok) throw new Error(d.error || "请求失败");
+        return d;
+      });
+    });
+  }
+
+  /* ---- 渲染 ---- */
+  function renderStats(){
+    api("/stats").then(function(d){
+      var html = [
+        card("名字总数", d.total),
+        card("热门名字", d.hotCount),
+        card("风格分布", Object.keys(d.byStyle).map(function(k){ return STYLE_LABEL[k] + " " + d.byStyle[k]; }).join(" · "), true),
+        card("宠物分布", Object.keys(d.byPet).map(function(k){ return PET_LABEL[k] + " " + d.byPet[k]; }).join(" · "), true)
+      ].join("");
+      $("#stat-cards").innerHTML = html;
+    }).catch(function(e){ /* 静默 */ });
+  }
+
+  function card(k, v, small){
+    return '<div class="stat"><div class="k">' + esc(k) + '</div><div class="v"' + (small ? ' style="font-size:14px;font-weight:600"' : "") + '>' + esc(v) + '</div></div>';
+  }
+
+  function renderRows(){
+    var q = state.q ? "&q=" + encodeURIComponent(state.q) : "";
+    api("/names?page=" + state.page + "&limit=" + state.limit + q).then(function(d){
+      state.total = d.total;
+      $("#page-info").textContent = "第 " + d.page + " / " + Math.max(1, Math.ceil(d.total / d.limit)) + " 页";
+      $("#total-info").textContent = "共 " + d.total + " 条";
+      $("#empty").style.display = d.rows.length ? "none" : "block";
+      $("#rows").innerHTML = d.rows.map(function(r){
+        var tags = r.s.map(function(k){ return '<span class="tag">' + esc(STYLE_LABEL[k] || k) + '</span>'; }).join("");
+        var pets = r.p.map(function(k){ return '<span class="tag">' + esc(PET_LABEL[k] || k) + '</span>'; }).join("");
+        return '<tr>' +
+          '<td>' + r.id + '</td>' +
+          '<td><b>' + esc(r.n) + '</b></td>' +
+          '<td class="mean">' + esc(r.m) + '</td>' +
+          '<td>' + esc(GENDER_LABEL[r.g] || "通用") + '</td>' +
+          '<td>' + tags + '</td>' +
+          '<td>' + pets + '</td>' +
+          '<td>' + (r.hot ? '<span class="tag hot">热门</span>' : "") + '</td>' +
+          '<td class="ops">' +
+            '<button class="btn btn-sm" data-act="edit" data-id="' + r.id + '">编辑</button> ' +
+            '<button class="btn btn-sm btn-danger" data-act="del" data-id="' + r.id + '" data-name="' + esc(r.n) + '">删除</button>' +
+          '</td>' +
+        '</tr>';
+      }).join("");
+    }).catch(function(e){ if(e.message !== "需要管理令牌") toast(e.message); });
+  }
+
+  function refresh(){
+    renderStats();
+    renderRows();
+  }
+
+  /* ---- 弹窗 ---- */
+  function pillSet(keys, labels, sel, elId, max){
+    var el = document.getElementById(elId);
+    el.innerHTML = keys.map(function(k){
+      return '<button type="button" class="pill' + (sel.indexOf(k) > -1 ? " on" : "") + '" data-k="' + k + '">' + labels[k] + '</button>';
+    }).join("");
+    el.onclick = function(e){
+      var b = e.target.closest(".pill");
+      if(!b) return;
+      var arr = sel;
+      var i = arr.indexOf(b.getAttribute("data-k"));
+      if(i > -1) arr.splice(i, 1);
+      else if(arr.length < max) arr.push(b.getAttribute("data-k"));
+      b.classList.toggle("on", arr.indexOf(b.getAttribute("data-k")) > -1);
+    };
+  }
+
+  function openModal(row){
+    state.editing = row || null;
+    $("#modal-title").textContent = row ? "编辑名字 · " + row.n : "新增名字";
+    $("#f-id").value = row ? row.id : "";
+    $("#f-n").value = row ? row.n : "";
+    $("#f-m").value = row ? row.m : "";
+    $("#f-hot").checked = row ? !!row.hot : false;
+    var gSel = row ? [row.g] : ["any"];
+    var g = document.getElementById("f-g");
+    g.innerHTML = ["m","f","any"].map(function(k){
+      return '<button type="button" class="pill' + (gSel.indexOf(k) > -1 ? " on" : "") + '" data-k="' + k + '">' + GENDER_LABEL[k] + '</button>';
+    }).join("");
+    g.onclick = function(e){
+      var b = e.target.closest(".pill");
+      if(!b) return;
+      g.querySelectorAll(".pill").forEach(function(x){ x.classList.toggle("on", x === b); });
+    };
+    pillSet(Object.keys(STYLE_LABEL), STYLE_LABEL, row ? row.s.slice() : [], "f-s", 3);
+    pillSet(Object.keys(PET_LABEL), PET_LABEL, row ? row.p.slice() : ["any"], "f-p", 3);
+    $("#mask").classList.add("open");
+  }
+
+  function closeModal(){ $("#mask").classList.remove("open"); }
+
+  function collectForm(){
+    var g = document.querySelector("#f-g .pill.on");
+    var s = Array.prototype.slice.call(document.querySelectorAll("#f-s .pill.on")).map(function(b){ return b.getAttribute("data-k"); });
+    var p = Array.prototype.slice.call(document.querySelectorAll("#f-p .pill.on")).map(function(b){ return b.getAttribute("data-k"); });
+    return {
+      n: $("#f-n").value.trim(),
+      m: $("#f-m").value.trim(),
+      g: g ? g.getAttribute("data-k") : "any",
+      s: s, p: p, hot: $("#f-hot").checked
+    };
+  }
+
+  /* ---- 事件 ---- */
+  $("#btn-add").addEventListener("click", function(){ openModal(null); });
+  $("#modal-cancel").addEventListener("click", closeModal);
+  $("#mask").addEventListener("click", function(e){ if(e.target === this) closeModal(); });
+  $("#btn-search").addEventListener("click", function(){ state.q = $("#search").value.trim(); state.page = 1; refresh(); });
+  $("#search").addEventListener("keydown", function(e){ if(e.key === "Enter"){ state.q = this.value.trim(); state.page = 1; refresh(); } });
+  $("#prev").addEventListener("click", function(){ if(state.page > 1){ state.page--; refresh(); } });
+  $("#next").addEventListener("click", function(){ if(state.page * state.limit < state.total){ state.page++; refresh(); } });
+  $("#btn-reload").addEventListener("click", refresh);
+
+  $("#token-save").addEventListener("click", function(){
+    saveToken($("#token-input").value.trim());
+    $("#tokenbar").style.display = "none";
+    toast("令牌已保存");
+    refresh();
+  });
+
+  $("#modal-save").addEventListener("click", function(){
+    var body = collectForm();
+    if(!body.n || !body.m){ toast("名字和释义不能为空"); return; }
+    var isEdit = !!state.editing;
+    var p = isEdit
+      ? api("/names/" + state.editing.id, { method:"PUT", body: JSON.stringify(body) })
+      : api("/names", { method:"POST", body: JSON.stringify(body) });
+    p.then(function(d){
+      toast(isEdit ? "已保存「" + d.row.n + "」" : "已新增「" + d.row.n + "」");
+      closeModal();
+      refresh();
+    }).catch(function(e){ toast(e.message); });
+  });
+
+  $("#rows").addEventListener("click", function(e){
+    var btn = e.target.closest("[data-act]");
+    if(!btn) return;
+    var id = btn.getAttribute("data-id");
+    if(btn.getAttribute("data-act") === "edit"){
+      api("/names/" + id).then(function(d){
+        openModal(d.row);
+      }).catch(function(e){ toast(e.message); });
+    } else {
+      var name = btn.getAttribute("data-name");
+      if(!window.confirm("确定删除「" + name + "」？删除后前台与 AI 立即生效。")) return;
+      api("/names/" + id, { method:"DELETE" }).then(function(){
+        toast("已删除「" + name + "」");
+        refresh();
+      }).catch(function(e){ toast(e.message); });
+    }
+  });
+
+  /* ---- 启动 ---- */
+  refresh();
+})();
+</script>
+</body>
+</html>

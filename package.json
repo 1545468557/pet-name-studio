@@ -1,0 +1,16 @@
+{
+  "name": "pet-name-studio",
+  "version": "1.1.0",
+  "description": "宠物起名工作室 —— 暖萌多画面网页 + AI Agent 起名后端",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "license": "MIT"
+}
