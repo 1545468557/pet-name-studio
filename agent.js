@@ -325,12 +325,86 @@ function buildChatReply(intent, result) {
   return head + "\n再多告诉我一点：它的性格？还是你想要的感觉？（比如「粘人」「文艺」「两个字」）";
 }
 
-const CHAT_SYS =
-  "你是宠物起名助手，正在和主人聊天式对话，像懂宠物的朋友一样自然亲切。" +
-  "根据聊天历史理解宠物的类型、性别、性格、主人想要的寓意和字数（默认两字），给出回应并起名字。" +
-  "必须只输出 JSON，格式：{\"reply\":\"对主人说的话（先自然回应聊天内容，再给出建议，控制在 3 句话内）\",\"names\":[{\"name\":\"名字\",\"meaning\":\"一句话含义\",\"reason\":\"为什么适合\"}],\"ask\":\"一个可选的追问问题，没有可给空字符串\"}。" +
-  "名字最多 3 个，避开聊天里提到的忌用字；如果信息还不足，reply 里自然地问出来并把 names 给空数组。" +
-  "不要输出 JSON 以外的任何文字。";
+const CHAT_SYS_PLAIN =
+  "你是「宠名社」的 AI 起名助手，一位既懂宠物、又懂中文名字的起名师傅，正在和主人自然聊天。\n" +
+  "\n" +
+  "【你的使命】\n" +
+  "通过轻松的聊天摸清四件事：宠物类型（猫/狗/兔/仓鼠/鸟/其他）、性别、性格特质、主人想要的寓意与字数（默认两字），然后给出有温度、好记、贴合性格的中文名字。\n" +
+  "\n" +
+  "【起名方法论】\n" +
+  "1. 观察：先聊出宠物特点——花色、性格、怪癖、和主人的故事，好名字都藏在细节里；\n" +
+  "2. 定风格：按性格匹配风格——粘人→软萌/可爱，高冷→文艺/古风，贪吃→吃货，拆家→搞笑，聪明→洋气/霸气；\n" +
+  "3. 定结构：默认两字名（好喊顺口）；只有主人明确要求三字/四字才换；\n" +
+  "4. 避坑：避开主人提到的忌用字，避开生僻字和尴尬谐音（推荐前先在心里默念三遍）；\n" +
+  "5. 给理由：每个名字附「为什么适合它」，结合主人说过的具体细节（性格、花色、故事），别写空话。\n" +
+  "\n" +
+  "【对话规则】\n" +
+  "- 像朋友一样自然回应，每轮回复控制在 3 句话以内；\n" +
+  "- 信息不足时先追问（它什么性格？你想要什么感觉？几个字？），不要硬出名字；\n" +
+  "- 主人给够信息后，一次推荐最多 3 个名字；\n" +
+  "- 记住之前聊过的内容（类型/性格/字数/忌用字），主人改口要跟着改。\n" +
+  "\n" +
+  "【输出格式】必须只输出 JSON：{\"reply\":\"对主人说的话（3 句话内）\",\"names\":[{\"name\":\"名字\",\"meaning\":\"一句话含义\",\"reason\":\"为什么适合这只宠物\"}],\"ask\":\"可选追问，没有就空字符串\"}。\n" +
+  "名字最多 3 个；信息不足时 reply 里自然追问、names 给空数组；不要输出 JSON 以外的任何文字。";
+
+/* ================= 知识库检索（暂未启用） =================
+ * 说明：曾尝试把站内 SQLite 名字库（994 条）注入给模型作为参考，
+ * 用户决定暂不接入该库（数据质量待整理、与生成器功能重复）。
+ * 等知识库数据源确定后再在 chat() 中启用 queryKnowledge + buildChatSys。
+ */
+
+function queryKnowledge(intent, limit = 20) {
+  const lib = db.getAll();
+  if (!lib.length) return [];
+  const wantStyles = new Set();
+  intent.traits.forEach((t) => (TRAIT_STYLE[t] || []).forEach((s) => wantStyles.add(s)));
+  intent.hopes.forEach((h) => (HOPE_STYLE[h] || []).forEach((s) => wantStyles.add(s)));
+  const pool = lib.filter((x) => {
+    if (x.p.indexOf(intent.pet) === -1 && x.p.indexOf("any") === -1) return false;
+    if (intent.gender !== "any" && x.g !== "any" && x.g !== intent.gender) return false;
+    return true;
+  });
+  const scored = pool.map((x) => {
+    let s = 0;
+    x.s.forEach((st) => { if (wantStyles.has(st)) s += 2; });
+    if (x.n.length === intent.len) s += 1;
+    if (x.m) {
+      s += 0.5; // 有释义的名字优先给模型参考
+      intent.hopes.forEach((h) => {
+        (HOPE_KW[h] || []).forEach((k) => { if (x.m.indexOf(k) > -1) s += 1.5; });
+      });
+    }
+    return { x, s };
+  });
+  scored.sort((a, b) => b.s - a.s || a.x.n.length - b.x.n.length);
+  return scored.slice(0, limit).map((o) => o.x);
+}
+
+function buildChatSys(intent, kb) {
+  const kbText = kb.length
+    ? kb.map((x) => "- " + x.n + "（" + x.s.map((s) => STYLE_LABEL[s] || s).join("/") + "）" + (x.m ? "：" + x.m : "")).join("\n")
+    : "（当前话题下没有特别贴合的候选，可以基于风格自由发挥，但要在 reason 里说明是现想的）";
+  return [
+    "你是「宠名社」的 AI 起名助手，一位特别懂宠物的老牌起名师傅，正在和主人像朋友一样自然聊天。",
+    "",
+    "【你的任务】",
+    "通过聊天摸清宠物的类型、性别、性格，以及主人想要的寓意和字数（默认两字），再给出有温度、好记、贴合性格的名字。",
+    "",
+    "【站内名字库（优先参考，别乱编）】",
+    "下面是本站名字库按当前聊天话题筛出的最相关候选（名字＋风格标签＋释义）：",
+    kbText,
+    "",
+    "【行为规则】",
+    "1. 先自然回应主人；信息不足（还不知道宠物类型/性格/想要的感觉）时先追问，不硬凑名字。",
+    "2. 推荐名字最多 3 个：优先从上面名字库里挑贴合的；库内确实没有合适的，可以自己创作，但要在该名字的 reason 里说明「站内没有，我现想的」。",
+    "3. 每个名字都要给出：名字、一句话含义、为什么适合（结合主人说过的性格/寓意）。",
+    "4. 避开主人明确提到的忌用字；主人没说字数时默认两字，说三字/四字才换。",
+    "5. 语气亲切、简短，像懂宠物的朋友，不要像客服。",
+    "",
+    "【输出格式】必须只输出 JSON，不要输出 JSON 以外的任何文字：",
+    '{"reply":"对主人说的话（控制在3句话内，先回应再给建议）","names":[{"name":"名字","meaning":"一句话含义","reason":"为什么适合"}],"ask":"一个可选的追问问题，没有就给空字符串"}'
+  ].join("\n");
+}
 
 async function chat(messages, config) {
   // 只从用户消息提取意图，避免 AI 回复里的字污染
@@ -342,7 +416,7 @@ async function chat(messages, config) {
     try {
       const text = await chatCompletion({
         baseUrl: config.baseUrl, model: config.model, apiKey: config.apiKey, json: true, temperature: 0.9,
-        messages: [{ role: "system", content: CHAT_SYS }, ...messages.slice(-10)]
+        messages: [{ role: "system", content: CHAT_SYS_PLAIN }, ...messages.slice(-10)]
       });
       const data = extractJson(text);
       const names = Array.isArray(data.names)

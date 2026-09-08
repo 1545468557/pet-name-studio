@@ -20,6 +20,8 @@ const config = {
   baseUrl: process.env.AI_BASE_URL || "",
   model: process.env.AI_MODEL || "",
   apiKey: process.env.AI_API_KEY || "",
+  difyBaseUrl: process.env.DIFY_BASE_URL || "https://api.dify.ai/v1", // Dify 平台 API（云版或自托管地址）
+  difyToken: process.env.DIFY_APP_TOKEN || "",      // Dify Chatflow 应用的 API 密钥（app-xxx）
   port: parseInt(process.env.PORT || "3000", 10),
   rateLimit: parseInt(process.env.RATE_LIMIT || "30", 10), // 每 IP 每分钟请求上限
   adminToken: process.env.ADMIN_TOKEN || ""         // 后台管理令牌；留空则本地开发直接放行
@@ -73,6 +75,57 @@ app.post("/api/ai-name", async (req, res) => {
   }
 });
 
+// ================= Dify 转发层（可选） =================
+// 配了 DIFY_APP_TOKEN 时，对话优先走 Dify Chatflow；失败自动回退现有 AI/本地引擎。
+// Dify 端约定：LLM 节点按 {reply, names[], ask} 输出 JSON，直接回复节点引用 LLM 的 text。
+
+async function difyChat(msg, convId, userId) {
+  const url = config.difyBaseUrl.replace(/\/+$/, "") + "/chat-messages";
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 25000);
+  try {
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + config.difyToken
+      },
+      body: JSON.stringify({
+        inputs: {},
+        query: msg,
+        response_mode: "blocking",
+        conversation_id: convId || "",
+        user: String(userId || "anonymous").slice(0, 36)
+      }),
+      signal: controller.signal
+    });
+    if (!resp.ok) {
+      const body = await resp.text().catch(() => "");
+      throw new Error("Dify HTTP " + resp.status + (body ? "：" + body.slice(0, 200) : ""));
+    }
+    const data = await resp.json();
+    return {
+      answer: String(data.answer || ""),
+      conversation_id: String(data.conversation_id || "")
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Dify answer 可能是 JSON 字符串（{reply,names,ask}），也可能是纯文本——两种都兼容
+function parseDifyAnswer(answer) {
+  try {
+    const start = answer.indexOf("{");
+    const end = answer.lastIndexOf("}");
+    if (start > -1 && end > start) {
+      const obj = JSON.parse(answer.slice(start, end + 1));
+      if (obj && typeof obj.reply === "string") return obj;
+    }
+  } catch (err) { /* 非 JSON，走纯文本 */ }
+  return { reply: answer, names: [], ask: "" };
+}
+
 // ================= 对话式起名（多轮聊天） =================
 const sessions = new Map();
 app.post("/api/ai-chat", async (req, res) => {
@@ -84,14 +137,46 @@ app.post("/api/ai-chat", async (req, res) => {
     let sid = String(body.sessionId || "");
     if (!sid || !sessions.has(sid)) {
       sid = crypto.randomUUID();
-      sessions.set(sid, { messages: [], t: Date.now() });
+      sessions.set(sid, { messages: [], t: Date.now(), difyConv: "" });
     }
     const session = sessions.get(sid);
     session.t = Date.now();
     session.messages.push({ role: "user", content: msg });
     if (session.messages.length > 30) session.messages = session.messages.slice(-30);
 
-    const result = await chat(session.messages, config);
+    let result;
+    if (config.difyToken) {
+      // 优先 Dify：多轮记忆用 Dify 的 conversation_id，Node 侧做映射
+      try {
+        const d = await difyChat(msg, session.difyConv || "", sid);
+        session.difyConv = d.conversation_id || session.difyConv;
+        const parsed = parseDifyAnswer(d.answer);
+        result = {
+          reply: String(parsed.reply || "").slice(0, 300),
+          names: Array.isArray(parsed.names)
+            ? parsed.names.map((n) => ({
+                name: String(n.name || "").trim(),
+                meaning: String(n.meaning || "").trim(),
+                reason: String(n.reason || "").trim(),
+                tags: Array.isArray(n.tags) ? n.tags.map(String).slice(0, 3) : [],
+                pet: "any"
+              })).filter((n) => n.name).slice(0, 3)
+            : [],
+          ask: String(parsed.ask || "").slice(0, 80),
+          engine: "dify",
+          mode: "ai"
+        };
+      } catch (err) {
+        // Dify 失败 → 回退原有引擎（DeepSeek 直连 / 本地兜底）
+        result = await chat(session.messages, config);
+        result.engine = (result.engine || "AI") + "（Dify 降级）";
+        result.mode = "fallback";
+        result.note = "Dify 调用失败，已用备选引擎：" + err.message;
+      }
+    } else {
+      result = await chat(session.messages, config);
+    }
+
     session.messages.push({ role: "assistant", content: result.reply });
 
     // 简单清理：最多保留 500 个会话，超出淘汰最旧
@@ -197,5 +282,5 @@ app.listen(config.port, () => {
   console.log("[pet-name-studio] 页面   http://localhost:" + config.port + "/");
   console.log("[pet-name-studio] 后台管理 http://localhost:" + config.port + "/admin" + (config.adminToken ? "（需令牌）" : "（未设令牌，本地开放）"));
   console.log("[pet-name-studio] 健康检查 http://localhost:" + config.port + "/api/health");
-  console.log("[pet-name-studio] AI 引擎 " + config.provider + (config.model ? " / " + config.model : "（本地引擎，配置 .env 可接入真实大模型）"));
+  console.log("[pet-name-studio] AI 引擎 " + (config.difyToken ? "Dify（" + config.difyBaseUrl + "）" : config.provider + (config.model ? " / " + config.model : "（本地引擎，配置 .env 可接入真实大模型）")));
 });

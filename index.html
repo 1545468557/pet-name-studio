@@ -214,7 +214,7 @@
   .daily-note{font-size:12.5px;color:var(--gray);font-weight:600}
 
   /* ============ 首页功能入口 ============ */
-  .entry-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;max-width:980px;margin:48px auto 0}
+  .entry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;max-width:980px;margin:48px auto 0}
   .entry-card{
     display:flex;align-items:center;gap:18px;padding:26px 24px;position:relative;
     background:var(--ec,#fff);border:3px solid var(--ink);border-radius:26px;
@@ -223,6 +223,9 @@
   }
   .entry-card:hover{transform:translateY(-5px);box-shadow:12px 12px 0 rgba(67,48,43,.2)}
   .entry-card:active{transform:translateY(0)}
+  @media (max-width:1080px){
+    .entry-card:last-child{grid-column:1/-1;justify-self:center;max-width:460px;width:100%}
+  }
   .ec-icon{
     width:64px;height:64px;border-radius:20px;background:#fff;
     border:2.5px solid var(--ink);display:flex;align-items:center;justify-content:center;
@@ -649,14 +652,6 @@
 
       <!-- 功能入口 -->
       <div class="entry-grid">
-        <a class="entry-card" href="#generator" data-view="generator" style="--ec:#FFD9C4">
-          <span class="ec-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><ellipse cx="12" cy="14.6" rx="5.3" ry="4.7"/><circle cx="5.4" cy="10.8" r="2.3"/><circle cx="10" cy="6.9" r="2.3"/><circle cx="14" cy="6.9" r="2.3"/><circle cx="18.6" cy="10.8" r="2.3"/></svg></span>
-          <div>
-            <h3>起名神器</h3>
-            <p>按类型、性别、风格一键生成，命中数实时看</p>
-          </div>
-          <span class="ec-arrow" aria-hidden="true">→</span>
-        </a>
         <a class="entry-card" href="#ai" data-view="ai" style="--ec:#E4D9FB">
           <span class="ec-new" aria-hidden="true">NEW</span>
           <span class="ec-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><path d="M12 2c1.2 6 4.2 8.8 10 10-5.8 1.2-8.8 4-10 10-1.2-6-4.2-8.8-10-10 5.8-1.2 8.8-4 10-10z"/></svg></span>
@@ -690,7 +685,6 @@
           <div class="cta-text">
             <h2>一个名字 + 一个毛孩子<br>= <mark>一辈子的故事</mark></h2>
             <p>现在就去给毛孩子挑一个会喊八百遍的好名字，趁它还没习惯被叫「那个」。</p>
-            <a class="btn btn-dark" href="#generator" data-view="generator">开始起名</a>
           </div>
           <img class="cta-art" src="https://aka.doubaocdn.com/s/xq1eZHTUKx" alt="小狗和小猫击掌庆祝的暖萌卡通插画" width="1024" height="1024">
         </div>
