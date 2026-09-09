@@ -3,7 +3,26 @@
 // 模型不可用 / 未配置 key 时自动降级到本地规则引擎（mock），体验不断档。
 "use strict";
 
-const db = require("./lib/db.js");
+// SQLite 延迟加载：queryKnowledge 停用期间不触碰数据库，
+// 保证本模块可在无 SQLite 的 Serverless 环境（如 Vercel）直接运行。
+let _db = null;
+function getDb() {
+  if (!_db) _db = require("./lib/db.js");
+  return _db;
+}
+
+// 名字库统一数据源：优先读只读 JSON（Serverless 部署），缺失时回退 SQLite（本地）
+let _libCache = null;
+function getNameLib() {
+  if (_libCache) return _libCache;
+  try {
+    _libCache = require("./data/names.json");
+    if (Array.isArray(_libCache) && _libCache.length) return _libCache;
+  } catch (err) { /* 无 JSON 文件，退回 SQLite */ }
+  _libCache = getDb().getAll();
+  return _libCache;
+}
+
 const { chatCompletion, extractJson } = require("./lib/models.js");
 
 const STYLE_LABEL = { cute: "可爱", artsy: "文艺", boss: "霸气", funny: "搞笑", food: "吃货", ancient: "古风", trendy: "洋气", soft: "软萌" };
@@ -104,7 +123,7 @@ async function generateStep(input, plan, config) {
 }
 
 function evaluateStep(input, candidates) {
-  const namesLib = db.getAll();
+  const namesLib = getNameLib();
   const avoid = input.avoid;
   const okLen = (name) => {
     const zh = name.replace(/[a-zA-Z\s]/g, "");
@@ -164,7 +183,7 @@ function shuffle(a) {
 }
 
 function mockEngine(input) {
-  const namesLib = db.getAll();
+  const namesLib = getNameLib();
   const avoid = input.avoid;
   const pool = namesLib.filter((x) => {
     if (x.p.indexOf(input.pet) === -1 && x.p.indexOf("any") === -1) return false;
@@ -227,7 +246,7 @@ function mockStrategy(input) {
   if (input.hopes.length) src.push("寓意「" + input.hopes.join("、") + "」");
   return "分析了" + (src.length ? src.join(" + ") : "你的选择") +
     (hint ? "，锁定「" + hint + "」方向" : "") +
-    "，从 " + db.getAll().length + " 个名字里筛出最合拍的 3 位。";
+    "，从 " + getNameLib().length + " 个名字里筛出最合拍的 3 位。";
 }
 
 /* ================= 对话层（聊天式起名） ================= */
@@ -354,7 +373,7 @@ const CHAT_SYS_PLAIN =
  */
 
 function queryKnowledge(intent, limit = 20) {
-  const lib = db.getAll();
+  const lib = getNameLib();
   if (!lib.length) return [];
   const wantStyles = new Set();
   intent.traits.forEach((t) => (TRAIT_STYLE[t] || []).forEach((s) => wantStyles.add(s)));

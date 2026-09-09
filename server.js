@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const express = require("express");
 const { runAgent, chat } = require("./agent.js");
 const db = require("./lib/db.js");
+const { difyChat, parseDifyAnswer } = require("./lib/dify.js");
 
 // 加载 .env（Node ≥21.7 内置支持；文件缺失时静默跳过，走真实环境变量）
 try {
@@ -75,58 +76,11 @@ app.post("/api/ai-name", async (req, res) => {
   }
 });
 
-// ================= Dify 转发层（可选） =================
-// 配了 DIFY_APP_TOKEN 时，对话优先走 Dify Chatflow；失败自动回退现有 AI/本地引擎。
-// Dify 端约定：LLM 节点按 {reply, names[], ask} 输出 JSON，直接回复节点引用 LLM 的 text。
-
-async function difyChat(msg, convId, userId) {
-  const url = config.difyBaseUrl.replace(/\/+$/, "") + "/chat-messages";
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 25000);
-  try {
-    const resp = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + config.difyToken
-      },
-      body: JSON.stringify({
-        inputs: {},
-        query: msg,
-        response_mode: "blocking",
-        conversation_id: convId || "",
-        user: String(userId || "anonymous").slice(0, 36)
-      }),
-      signal: controller.signal
-    });
-    if (!resp.ok) {
-      const body = await resp.text().catch(() => "");
-      throw new Error("Dify HTTP " + resp.status + (body ? "：" + body.slice(0, 200) : ""));
-    }
-    const data = await resp.json();
-    return {
-      answer: String(data.answer || ""),
-      conversation_id: String(data.conversation_id || "")
-    };
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-// Dify answer 可能是 JSON 字符串（{reply,names,ask}），也可能是纯文本——两种都兼容
-function parseDifyAnswer(answer) {
-  try {
-    const start = answer.indexOf("{");
-    const end = answer.lastIndexOf("}");
-    if (start > -1 && end > start) {
-      const obj = JSON.parse(answer.slice(start, end + 1));
-      if (obj && typeof obj.reply === "string") return obj;
-    }
-  } catch (err) { /* 非 JSON，走纯文本 */ }
-  return { reply: answer, names: [], ask: "" };
-}
-
 // ================= 对话式起名（多轮聊天） =================
+// 兼容两种客户端模式：
+//   A. 旧模式（本地）：只传 {sessionId, message}，服务端用内存 Map 记忆会话
+//   B. 无状态模式（Serverless 前端）：传 {message, history[], conversationId?}，
+//      历史由前端全量携带；Dify 的 conversation_id 也由前端保存回传
 const sessions = new Map();
 app.post("/api/ai-chat", async (req, res) => {
   try {
@@ -141,14 +95,23 @@ app.post("/api/ai-chat", async (req, res) => {
     }
     const session = sessions.get(sid);
     session.t = Date.now();
+
+    // 无状态模式：前端给 history 则直接采用；否则走服务端 Map 记忆
+    if (Array.isArray(body.history)) {
+      session.messages = body.history
+        .filter((h) => h && typeof h.content === "string")
+        .slice(-29)
+        .map((h) => ({ role: h.role === "assistant" ? "assistant" : "user", content: String(h.content).slice(0, 500) }));
+    }
     session.messages.push({ role: "user", content: msg });
     if (session.messages.length > 30) session.messages = session.messages.slice(-30);
 
     let result;
+    const convId = String(body.conversationId || session.difyConv || "");
     if (config.difyToken) {
-      // 优先 Dify：多轮记忆用 Dify 的 conversation_id，Node 侧做映射
+      // 优先 Dify：多轮记忆用 conversation_id（本地存 Map / Serverless 由前端回传）
       try {
-        const d = await difyChat(msg, session.difyConv || "", sid);
+        const d = await difyChat(config, msg, convId, sid);
         session.difyConv = d.conversation_id || session.difyConv;
         const parsed = parseDifyAnswer(d.answer);
         result = {
@@ -164,7 +127,8 @@ app.post("/api/ai-chat", async (req, res) => {
             : [],
           ask: String(parsed.ask || "").slice(0, 80),
           engine: "dify",
-          mode: "ai"
+          mode: "ai",
+          conversationId: session.difyConv || undefined
         };
       } catch (err) {
         // Dify 失败 → 回退原有引擎（DeepSeek 直连 / 本地兜底）

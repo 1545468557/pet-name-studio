@@ -1648,7 +1648,7 @@
     return "http://localhost:3000";
   }
 
-  var chatState = { sessionId: null, intent: { pet:"any", gender:"any", traits:[], hopes:[], len:2, avoid:"" }, busy: false };
+  var chatState = { sessionId: null, history: [], difyConv: "", intent: { pet:"any", gender:"any", traits:[], hopes:[], len:2, avoid:"" }, busy: false };
 
   function initAiStatus(){
     var dot = $("#ai-status-dot");
@@ -1880,11 +1880,17 @@
 
   function callChatServer(msg){
     var ctrl = new AbortController();
-    var timer = setTimeout(function(){ ctrl.abort(); }, 18000);
+    var timer = setTimeout(function(){ ctrl.abort(); }, 25000);
+    // 无状态模式：历史全量携带（Serverless 兼容）；Dify conversation_id 前端保存回传
     return fetch(apiBase() + "/api/ai-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId: chatState.sessionId, message: msg }),
+      body: JSON.stringify({
+        sessionId: chatState.sessionId,
+        message: msg,
+        history: chatState.history.slice(-29),
+        conversationId: chatState.difyConv || ""
+      }),
       signal: ctrl.signal
     }).then(function(resp){
       if(!resp.ok) throw new Error("HTTP " + resp.status);
@@ -1907,6 +1913,10 @@
     chatTyping();
     callChatServer(msg).then(function(data){
       chatState.sessionId = data.sessionId || chatState.sessionId;
+      if(data.conversationId) chatState.difyConv = data.conversationId;
+      chatState.history.push({ role: "user", content: msg });
+      chatState.history.push({ role: "assistant", content: data.reply || "" });
+      if(chatState.history.length > 30) chatState.history = chatState.history.slice(-30);
       chatRemoveTyping();
       chatAppend("ai", { text: data.reply || "……", names: data.names || [], engine: data.engine, note: data.note, local: data.mode === "fallback" });
       chatState.busy = false;
@@ -1920,6 +1930,8 @@
 
   function chatReset(){
     chatState.sessionId = null;
+    chatState.history = [];
+    chatState.difyConv = "";
     chatState.intent = { pet:"any", gender:"any", traits:[], hopes:[], len:2, avoid:"" };
     $("#chat-box").innerHTML = "";
     $("#chat-quick").style.display = "flex";

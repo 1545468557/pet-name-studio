@@ -140,3 +140,22 @@ pet-name-studio/
 [MIT](LICENSE) © 2026 [1545468557](https://github.com/1545468557)
 
 名字仅供娱乐参考，最终解释权归毛孩子所有。
+
+## 部署到 Vercel（Serverless）
+
+项目内置 Vercel 适配（`vercel.json` + `api/index.js`），推送到 GitHub 后即可在 Vercel 导入部署：
+
+1. 在 [vercel.com](https://vercel.com) 用 GitHub 账号登录 → **Add New Project** → 导入本仓库，框架选择 **Other**，构建命令留空，输出目录留空；
+2. 在 **Settings → Environment Variables** 添加（与本地 `.env` 同名）：
+   - `AI_PROVIDER` / `AI_BASE_URL` / `AI_MODEL` / `AI_API_KEY`（DeepSeek 直连）
+   - 或 `DIFY_BASE_URL` / `DIFY_APP_TOKEN`（Dify Chatflow，优先）
+3. 部署后访问分配的 `https://<项目名>.vercel.app`。
+
+### Serverless 环境的差异
+
+| 能力 | 本地（node server.js） | Vercel |
+|---|---|---|
+| 名字库读取（994 条） | SQLite `petname.db` | 只读 `data/names.json` |
+| AI 对话多轮记忆 | 服务端内存 Map | 前端全量携带历史（`body.history`），Dify 模式由前端保存 `conversation_id` |
+| 后台管理增删改 | 支持 | 不支持（返回 501；如需线上管理，接入 Turso/Supabase 外置数据库） |
+| 函数超时 | — | `maxDuration: 60s`（Hobby 上限） |
