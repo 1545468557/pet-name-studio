@@ -5,8 +5,7 @@
   ],
   "functions": {
     "api/index.js": {
-      "maxDuration": 60,
-      "runtime": "nodejs22.x"
+      "maxDuration": 60
     }
   }
 }
